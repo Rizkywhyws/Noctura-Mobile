@@ -19,14 +19,16 @@ class _DashboardScreenState extends State<DashboardScreen> {
 
   void _toggleTheme() {
     setState(() => _isDarkMode = !_isDarkMode);
-    // Jika menggunakan provider/riverpod, panggil method toggle di sini
   }
 
   @override
   Widget build(BuildContext context) {
     final size = MediaQuery.sizeOf(context);
     final hPadding = size.width * 0.05;
-    final vGap = size.height * 0.010;
+    final vGap = size.height * 0.020;
+
+    // 🔥 Responsive check
+    final isSmallScreen = size.height < 700 || size.width < 600;
 
     return Scaffold(
       backgroundColor: Colors.white,
@@ -40,29 +42,28 @@ class _DashboardScreenState extends State<DashboardScreen> {
             ),
 
             Expanded(
-              child: Padding(
-                padding: EdgeInsets.symmetric(
-                  horizontal: hPadding,
-                  vertical: 14,
-                ),
-                child: LayoutBuilder(
-                  builder: (context, constraints) {
-                    return Column(
-                      crossAxisAlignment: CrossAxisAlignment.stretch,
-                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                      children: [
-                        const SleepCard(),
-                        SizedBox(height: vGap),
-                        const PredictionButton(),
-                        SizedBox(height: vGap),
-                        const FeatureGrid(),
-                        SizedBox(height: vGap),
-                        const InsightCard(),
-                      ],
-                    );
-                  },
-                ),
-              ),
+              child: isSmallScreen
+                  // 🔥 Kalau layar kecil → pakai scroll (hindari overflow)
+                  ? SingleChildScrollView(
+                      physics: const BouncingScrollPhysics(),
+                      padding: EdgeInsets.symmetric(
+                        horizontal: hPadding,
+                        vertical: 16,
+                      ),
+                      child: _buildContent(vGap),
+                    )
+                  // 🔥 Kalau layar normal → no scroll (full layout)
+                  : Padding(
+                      padding: EdgeInsets.symmetric(
+                        horizontal: hPadding,
+                        vertical: 16,
+                      ),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.stretch,
+                        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                        children: _buildChildren(vGap),
+                      ),
+                    ),
             ),
 
             SafeArea(
@@ -77,5 +78,26 @@ class _DashboardScreenState extends State<DashboardScreen> {
         ),
       ),
     );
+  }
+
+  // 🔥 Untuk mode scroll
+  Widget _buildContent(double vGap) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: _buildChildren(vGap),
+    );
+  }
+
+  // 🔥 Reusable children
+  List<Widget> _buildChildren(double vGap) {
+    return [
+      const SleepCard(),
+      SizedBox(height: vGap),
+      const PredictionButton(),
+      SizedBox(height: vGap),
+      const FeatureGrid(),
+      SizedBox(height: vGap),
+      const InsightCard(),
+    ];
   }
 }
