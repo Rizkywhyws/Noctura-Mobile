@@ -29,16 +29,16 @@ class DropdownItemTile extends StatelessWidget {
                 height: 32,
                 decoration: BoxDecoration(
                   color: isSelected
-                      ? const Color(0xFFE6F1FB)
-                      : const Color(0xFFF9FAFB),
+                      ? (item.iconBg ?? const Color(0xFFE6F1FB))
+                      : (item.iconBg ?? const Color(0xFFF9FAFB)),
                   borderRadius: BorderRadius.circular(8),
                 ),
                 child: Icon(
                   item.icon,
                   size: 16,
                   color: isSelected
-                      ? const Color(0xFF185FA5)
-                      : const Color(0xFF9CA3AF),
+                      ? (item.iconColor ?? const Color(0xFF000080))
+                      : (item.iconColor ?? const Color(0xFF9CA3AF)),
                 ),
               ),
             if (item.icon != null) const SizedBox(width: 10),
@@ -55,7 +55,7 @@ class DropdownItemTile extends StatelessWidget {
                           ? FontWeight.w600
                           : FontWeight.w400,
                       color: isSelected
-                          ? const Color(0xFF185FA5)
+                          ? const Color(0xFF000080)
                           : const Color(0xFF1A202C),
                     ),
                   ),

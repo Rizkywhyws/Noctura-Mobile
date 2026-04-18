@@ -40,11 +40,9 @@ class _AssessmentDropdownState extends State<AssessmentDropdown>
     super.dispose();
   }
 
-  // Dipanggil otomatis setiap kali keyboard muncul/hilang
   @override
   void didChangeMetrics() {
     if (_isOpen) {
-      // Rebuild overlay dengan posisi baru
       _overlayEntry?.markNeedsBuild();
     }
   }
@@ -66,7 +64,6 @@ class _AssessmentDropdownState extends State<AssessmentDropdown>
   }
 
   OverlayEntry _buildOverlay() {
-    // Simpan referensi RenderBox saat ini (posisi field tidak berubah)
     final box = context.findRenderObject() as RenderBox;
     final size = box.size;
     final position = box.localToGlobal(Offset.zero);
