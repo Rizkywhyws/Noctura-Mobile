@@ -15,25 +15,25 @@ class Step3Activity extends StatelessWidget {
   });
 
   static const _activityData = [
-    (
-      value: 'SEDENTARY',
-      label: 'Sedentary',
-      subtitle: '< 3000 langkah',
-      icon: Icons.chair_alt_outlined,
-    ),
-    (
-      value: 'LIGHT',
-      label: 'Light',
-      subtitle: '3000–6000',
-      icon: Icons.directions_walk_outlined,
-    ),
-    (
-      value: 'ACTIVE',
-      label: 'Active',
-      subtitle: '> 6000 langkah',
-      icon: Icons.directions_run_outlined,
-    ),
-  ];
+  (
+    value: 35,        // ✅ Nilai minimum dataset
+    label: 'Sedentary',
+    subtitle: '< 3000 langkah',
+    icon: Icons.chair_alt_outlined,
+  ),
+  (
+    value: 62,        
+    label: 'Light',
+    subtitle: '3000–6000',
+    icon: Icons.directions_walk_outlined,
+  ),
+  (
+    value: 90,        // ✅ Nilai maksimum dataset
+    label: 'Active',
+    subtitle: '> 6000 langkah',
+    icon: Icons.directions_run_outlined,
+  ),
+];
 
   @override
   Widget build(BuildContext context) {

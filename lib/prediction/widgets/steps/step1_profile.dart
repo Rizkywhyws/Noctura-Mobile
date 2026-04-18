@@ -66,6 +66,38 @@ class Step1Profile extends StatelessWidget {
       iconBg: Color(0xFFEAF3DE),
       iconColor: Color(0xFF3B6D11),
     ),
+    DropdownItem(
+  value: 'Perawat',
+  label: 'Perawat',
+  subtitle: 'Tenaga kesehatan',
+  icon: Icons.health_and_safety_outlined,
+  iconBg: Color(0xFFFCEBEB),
+  iconColor: Color(0xFFA32D2D),
+),
+DropdownItem(
+  value: 'Ilmuwan',
+  label: 'Ilmuwan',
+  subtitle: 'Penelitian & Sains',
+  icon: Icons.science_outlined,
+  iconBg: Color(0xFFE8F4FD),
+  iconColor: Color(0xFF1565C0),
+),
+DropdownItem(
+  value: 'Sales',
+  label: 'Sales',
+  subtitle: 'Penjualan',
+  icon: Icons.storefront_outlined,
+  iconBg: Color(0xFFFFF3E0),
+  iconColor: Color(0xFFE65100),
+),
+DropdownItem(
+  value: 'Sales Representative',
+  label: 'Sales Representative',
+  subtitle: 'Penjualan & Pemasaran',
+  icon: Icons.handshake_outlined,
+  iconBg: Color(0xFFF3E5F5),
+  iconColor: Color(0xFF6A1B9A),
+),
   ];
 
   @override
