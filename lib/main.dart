@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
+import 'login/login_screen.dart';
 import 'dashboard/dashboard_screen.dart';
-import 'prediction/prediction_screen.dart'; 
+import 'prediction/prediction_screen.dart';
+import 'prediction/prediction_screen.dart'; // Pastikan file ini sudah dibuat
 
 void main() => runApp(const NocturaApp());
 
@@ -12,11 +14,14 @@ class NocturaApp extends StatelessWidget {
     return MaterialApp(
       title: 'Noctura',
       debugShowCheckedModeBanner: false,
-      theme: ThemeData(useMaterial3: true, fontFamily: 'Inter'),
-      home: const DashboardScreen(), 
-      
-
+      theme: ThemeData(
+        useMaterial3: true,
+        fontFamily: 'Inter',
+        colorScheme: ColorScheme.fromSeed(seedColor: const Color(0xFF0B1D51)), // Navy Blue Base
+      ),
+      home: const LoginScreen(), // 🔄 Login jadi halaman pertama
       routes: {
+        '/dashboard': (context) => const DashboardScreen(),
         '/assessment': (context) => const AssessmentScreen(),
       },
     );
