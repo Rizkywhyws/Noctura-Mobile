@@ -5,7 +5,7 @@ import 'widgets/prediction_button.dart';
 import 'widgets/feature_grid.dart';
 import 'widgets/insight_card.dart';
 import '../core/widgets/bottom_navigation.dart';
-import 'package:sleep_detection_mobile/prediction/prediction_screen.dart';
+import '../prediction/prediction_screen.dart';
 
 class DashboardScreen extends StatefulWidget {
   const DashboardScreen({super.key});
@@ -17,22 +17,32 @@ class DashboardScreen extends StatefulWidget {
 class _DashboardScreenState extends State<DashboardScreen>
     with TickerProviderStateMixin {
   int _selectedIndex = 0;
-  int _previousIndex = 0;
   bool _isDarkMode = false;
 
+  // ✅ Satu controller, dibuat sekali, tidak di-recreate
   late final AnimationController _animController;
-  late Animation<double> _fadeAnim;
+  late final Animation<double> _fadeAnim;
+
+  // ✅ Slide direction dikontrol via Tween yang di-update, bukan rebuild controller
   late Animation<Offset> _slideAnim;
+  bool _slideForward = true;
 
   @override
   void initState() {
     super.initState();
     _animController = AnimationController(
       vsync: this,
-      duration: const Duration(milliseconds: 320),
+      duration: const Duration(milliseconds: 280),
     );
-    _buildAnimations(forward: true);
-    _animController.value = 1.0; 
+
+    _fadeAnim = Tween<double>(begin: 0.0, end: 1.0).animate(
+      CurvedAnimation(parent: _animController, curve: Curves.easeOut),
+    );
+
+    _slideAnim = _buildSlideAnim(forward: true);
+
+    // Mulai sudah selesai animasi (tampil langsung)
+    _animController.value = 1.0;
   }
 
   @override
@@ -41,26 +51,26 @@ class _DashboardScreenState extends State<DashboardScreen>
     super.dispose();
   }
 
-  void _buildAnimations({required bool forward}) {
-    _fadeAnim = Tween<double>(begin: 0.0, end: 1.0).animate(
-      CurvedAnimation(parent: _animController, curve: Curves.easeOut),
-    );
-    final beginOffset =
-        forward ? const Offset(0.06, 0) : const Offset(-0.06, 0);
-    _slideAnim =
-        Tween<Offset>(begin: beginOffset, end: Offset.zero).animate(
+  Animation<Offset> _buildSlideAnim({required bool forward}) {
+    return Tween<Offset>(
+      begin: Offset(forward ? 0.05 : -0.05, 0),
+      end: Offset.zero,
+    ).animate(
       CurvedAnimation(parent: _animController, curve: Curves.easeOutCubic),
     );
   }
 
   void _onTabTapped(int index) {
     if (index == _selectedIndex) return;
+
     final forward = index > _selectedIndex;
-    setState(() {
-      _previousIndex = _selectedIndex;
-      _selectedIndex = index;
-    });
-    _buildAnimations(forward: forward);
+
+    // ✅ Update tween direction SEBELUM setState
+    _slideAnim = _buildSlideAnim(forward: forward);
+
+    setState(() => _selectedIndex = index);
+
+    // ✅ Jalankan animasi dari 0 — controller tidak di-dispose/recreate
     _animController.forward(from: 0);
   }
 
@@ -85,25 +95,49 @@ class _DashboardScreenState extends State<DashboardScreen>
             ),
 
             Expanded(
-              child: AnimatedBuilder(
-                animation: _animController,
-                builder: (context, child) => FadeTransition(
-                  opacity: _fadeAnim,
-                  child: SlideTransition(
-                    position: _slideAnim,
-                    child: child,
-                  ),
-                ),
-                // Gunakan ValueKey agar Flutter swap widget lama ↔ baru
-                child: KeyedSubtree(
-                  key: ValueKey(_selectedIndex),
-                  child: _buildPage(
+              child: Stack(
+                children: [
+                  // ✅ IndexedStack: semua halaman tetap hidup di memory,
+                  // tidak ada rebuild saat pindah tab
+                  IndexedStack(
                     index: _selectedIndex,
-                    hPadding: hPadding,
-                    vGap: vGap,
-                    isSmallScreen: isSmallScreen,
+                    children: [
+                      _DashboardHome(
+                        hPadding: hPadding,
+                        vGap: vGap,
+                        isSmallScreen: isSmallScreen,
+                      ),
+                      const AssessmentScreen(),
+                      // Tambah tab lain di sini
+                    ],
                   ),
-                ),
+
+                  // ✅ Overlay animasi di atas IndexedStack
+                  // Pointer events diteruskan ke bawah saat animasi selesai
+                  AnimatedBuilder(
+                    animation: _animController,
+                    builder: (context, _) {
+                      // Animasi selesai → overlay transparan & tidak intercept touch
+                      if (_animController.isCompleted) {
+                        return const SizedBox.shrink();
+                      }
+                      return FadeTransition(
+                        opacity: Tween<double>(begin: 1.0, end: 0.0).animate(
+                          CurvedAnimation(
+                            parent: _animController,
+                            curve: Curves.easeOut,
+                          ),
+                        ),
+                        child: SlideTransition(
+                          position: _slideAnim,
+                          child: IgnorePointer(
+                            child: Container(color: Colors.white),
+                          ),
+                        ),
+                      );
+                    },
+                  ),
+                ],
               ),
             ),
 
@@ -119,51 +153,50 @@ class _DashboardScreenState extends State<DashboardScreen>
       ),
     );
   }
+}
 
-  Widget _buildPage({
-    required int index,
-    required double hPadding,
-    required double vGap,
-    required bool isSmallScreen,
-  }) {
-    switch (index) {
-      case 1:
-        return const AssessmentScreen();
-      // tambahkan case lain di sini sesuai tab
-      default:
-        return isSmallScreen
-            ? SingleChildScrollView(
-                physics: const BouncingScrollPhysics(),
-                padding: EdgeInsets.symmetric(
-                  horizontal: hPadding,
-                  vertical: 16,
-                ),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.stretch,
-                  children: _dashboardChildren(vGap),
-                ),
-              )
-            : Padding(
-                padding: EdgeInsets.symmetric(
-                  horizontal: hPadding,
-                  vertical: 16,
-                ),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.stretch,
-                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                  children: _dashboardChildren(vGap),
-                ),
-              );
-    }
+// ── Dashboard home page dipisah jadi widget sendiri ──
+class _DashboardHome extends StatelessWidget {
+  final double hPadding;
+  final double vGap;
+  final bool isSmallScreen;
+
+  const _DashboardHome({
+    required this.hPadding,
+    required this.vGap,
+    required this.isSmallScreen,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final children = [
+      const SleepCard(),
+      SizedBox(height: vGap),
+      const PredictionButton(),
+      SizedBox(height: vGap),
+      const FeatureGrid(),
+      SizedBox(height: vGap),
+      const InsightCard(),
+    ];
+
+    return isSmallScreen
+        ? SingleChildScrollView(
+            physics: const BouncingScrollPhysics(),
+            padding:
+                EdgeInsets.symmetric(horizontal: hPadding, vertical: 16),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: children,
+            ),
+          )
+        : Padding(
+            padding:
+                EdgeInsets.symmetric(horizontal: hPadding, vertical: 16),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+              children: children,
+            ),
+          );
   }
-
-  List<Widget> _dashboardChildren(double vGap) => [
-        const SleepCard(),
-        SizedBox(height: vGap),
-        const PredictionButton(),
-        SizedBox(height: vGap),
-        const FeatureGrid(),
-        SizedBox(height: vGap),
-        const InsightCard(),
-      ];
 }
