@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'widgets/wavy_header.dart';
+import '../core/widgets/wavy_header.dart';
 import 'widgets/register_form.dart';
 
 class RegisterScreen extends StatelessWidget {
