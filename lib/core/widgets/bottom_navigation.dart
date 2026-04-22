@@ -13,7 +13,7 @@ class BottomNavigation extends StatelessWidget {
   static const _items = [
     (Icons.home, 'HOME'),
     (Icons.psychology_outlined, 'PREDIKSI'),
-    (Icons.history_outlined, 'RIWAYAT'),
+    (Icons.bar_chart_rounded, 'VISUALISASI'),
     (Icons.menu_book_outlined, 'EDUKASI'),
     (Icons.person_outline, 'PROFIL'),
   ];

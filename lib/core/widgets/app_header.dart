@@ -2,29 +2,33 @@ import 'package:flutter/material.dart';
 
 class AppHeader extends StatelessWidget {
   final VoidCallback? onThemeToggle;
+  final VoidCallback? onHistoryTap;
   final bool isDarkMode;
 
   const AppHeader({
     super.key,
     this.onThemeToggle,
+    this.onHistoryTap,
     this.isDarkMode = false,
   });
 
-  static const _lightBg = Color(0xFFF7FAFC);
-  static const _darkBg = Color(0xFF2D3748);
+  static const _lightBg = Color(0xFFF8FAFC);
+  static const _darkBg = Color(0xFF1E293B);
 
   static const _lightBorder = Color(0xFFE2E8F0);
-  static const _darkBorder = Color(0xFF4A5568);
+  static const _darkBorder = Color(0xFF475569);
 
-  static const _textPrimary = Color(0xFF1A202C);
-  static const _textSecondary = Color(0xFF718096);
+  static const _textPrimary = Color(0xFF0F172A);
+  static const _textSecondary = Color(0xFF64748B);
 
   static const _notifRed = Color(0xFFEF5350);
-  static const _onlineGreen = Color(0xFF4CAF50);
+  static const _onlineGreen = Color(0xFF22C55E);
+  static const _blue = Color(0xFF2563EB);
+  static const _blueSoft = Color(0xFFEAF2FF);
 
   @override
   Widget build(BuildContext context) {
-    final greeting = _getGreeting(); // 🔥 hitung sekali
+    final greeting = _getGreeting();
 
     return Column(
       children: [
@@ -33,16 +37,13 @@ class AppHeader extends StatelessWidget {
           child: Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              /// LEFT SECTION
               Row(
                 children: [
-                  const _Avatar(), // 🔥 isolate widget
+                  const _Avatar(),
                   const SizedBox(width: 12),
                   _TitleSection(greeting: greeting),
                 ],
               ),
-
-              /// RIGHT SECTION
               Row(
                 children: [
                   _CircleButton(
@@ -53,17 +54,21 @@ class AppHeader extends StatelessWidget {
                     onTap: onThemeToggle,
                   ),
                   const SizedBox(width: 8),
+                  _HistoryButton(
+                    isDarkMode: isDarkMode,
+                    onTap: onHistoryTap,
+                  ),
+                  const SizedBox(width: 8),
                   const _NotificationButton(),
                 ],
               ),
             ],
           ),
         ),
-
-        const Divider(
-          color: Color(0xFFEDF2F7),
-          thickness: 0.5,
-          height: 0.5,
+        Divider(
+          color: _lightBorder.withOpacity(0.75),
+          thickness: 0.6,
+          height: 0.6,
         ),
       ],
     );
@@ -89,13 +94,31 @@ class _Avatar extends StatelessWidget {
           Container(
             width: 40,
             height: 40,
-            decoration: const BoxDecoration(
-              color: Color(0xFFE3F2FD), // 🔥 ganti gradient → lebih ringan
+            decoration: BoxDecoration(
+              gradient: const LinearGradient(
+                begin: Alignment.topLeft,
+                end: Alignment.bottomRight,
+                colors: [
+                  Color(0xFFEAF2FF),
+                  Color(0xFFDCEBFF),
+                ],
+              ),
               shape: BoxShape.circle,
+              border: Border.all(
+                color: Colors.white.withOpacity(0.85),
+                width: 1,
+              ),
+              boxShadow: [
+                BoxShadow(
+                  color: const Color(0xFF2563EB).withOpacity(0.12),
+                  blurRadius: 10,
+                  offset: const Offset(0, 4),
+                ),
+              ],
             ),
             child: const Icon(
-              Icons.person,
-              color: Color(0xFF1976D2),
+              Icons.person_rounded,
+              color: Color(0xFF2563EB),
               size: 22,
             ),
           ),
@@ -105,9 +128,10 @@ class _Avatar extends StatelessWidget {
             child: Container(
               width: 10,
               height: 10,
-              decoration: const BoxDecoration(
-                color: Color(0xFF4CAF50),
+              decoration: BoxDecoration(
+                color: AppHeader._onlineGreen,
                 shape: BoxShape.circle,
+                border: Border.all(color: Colors.white, width: 1.5),
               ),
             ),
           ),
@@ -126,16 +150,25 @@ class _TitleSection extends StatelessWidget {
   Widget build(BuildContext context) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
-      children: const [
-        Text(
+      children: [
+        const Text(
           'Noctura',
           style: TextStyle(
             fontSize: 18,
-            fontWeight: FontWeight.w600,
-            color: Color(0xFF1A202C),
+            fontWeight: FontWeight.w700,
+            color: AppHeader._textPrimary,
+            letterSpacing: -0.2,
           ),
         ),
-        SizedBox(height: 2),
+        const SizedBox(height: 2),
+        Text(
+          greeting,
+          style: const TextStyle(
+            fontSize: 12,
+            fontWeight: FontWeight.w500,
+            color: AppHeader._textSecondary,
+          ),
+        ),
       ],
     );
   }
@@ -157,6 +190,8 @@ class _CircleButton extends StatelessWidget {
     final bg = isDarkMode ? AppHeader._darkBg : AppHeader._lightBg;
     final border =
         isDarkMode ? AppHeader._darkBorder : AppHeader._lightBorder;
+    final iconColor =
+        isDarkMode ? Colors.white : const Color(0xFF334155);
 
     return GestureDetector(
       onTap: onTap,
@@ -167,8 +202,66 @@ class _CircleButton extends StatelessWidget {
           color: bg,
           shape: BoxShape.circle,
           border: Border.all(color: border, width: 1),
+          boxShadow: [
+            BoxShadow(
+              color: const Color(0xFF0F172A).withOpacity(0.05),
+              blurRadius: 8,
+              offset: const Offset(0, 3),
+            ),
+          ],
         ),
-        child: Icon(icon, size: 18),
+        child: Icon(icon, size: 18, color: iconColor),
+      ),
+    );
+  }
+}
+
+class _HistoryButton extends StatelessWidget {
+  final bool isDarkMode;
+  final VoidCallback? onTap;
+
+  const _HistoryButton({
+    required this.isDarkMode,
+    this.onTap,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final border =
+        isDarkMode ? AppHeader._darkBorder : AppHeader._lightBorder;
+
+    return GestureDetector(
+      onTap: onTap,
+      child: Container(
+        width: 38,
+        height: 38,
+        decoration: BoxDecoration(
+          gradient: const LinearGradient(
+            begin: Alignment.topLeft,
+            end: Alignment.bottomRight,
+            colors: [
+              AppHeader._blue,
+              Color(0xFF4F7DF3),
+            ],
+          ),
+          shape: BoxShape.circle,
+          border: Border.all(
+            color: border.withOpacity(0.35),
+            width: 1,
+          ),
+          boxShadow: [
+            BoxShadow(
+              color: AppHeader._blue.withOpacity(0.22),
+              blurRadius: 10,
+              offset: const Offset(0, 4),
+            ),
+          ],
+        ),
+        child: const Icon(
+          Icons.history_rounded,
+          size: 18,
+          color: Colors.white,
+        ),
       ),
     );
   }
@@ -185,11 +278,33 @@ class _NotificationButton extends StatelessWidget {
           Container(
             width: 38,
             height: 38,
-            decoration: const BoxDecoration(
-              color: Color(0xFFF7FAFC),
+            decoration: BoxDecoration(
+              gradient: const LinearGradient(
+                begin: Alignment.topLeft,
+                end: Alignment.bottomRight,
+                colors: [
+                  Color(0xFFFFFFFF),
+                  AppHeader._blueSoft,
+                ],
+              ),
               shape: BoxShape.circle,
+              border: Border.all(
+                color: AppHeader._lightBorder,
+                width: 1,
+              ),
+              boxShadow: [
+                BoxShadow(
+                  color: const Color(0xFF0F172A).withOpacity(0.05),
+                  blurRadius: 8,
+                  offset: const Offset(0, 3),
+                ),
+              ],
             ),
-            child: const Icon(Icons.notifications_outlined, size: 18),
+            child: const Icon(
+              Icons.notifications_outlined,
+              size: 18,
+              color: Color(0xFF334155),
+            ),
           ),
           Positioned(
             top: 6,
@@ -197,9 +312,10 @@ class _NotificationButton extends StatelessWidget {
             child: Container(
               width: 8,
               height: 8,
-              decoration: const BoxDecoration(
+              decoration: BoxDecoration(
                 color: AppHeader._notifRed,
                 shape: BoxShape.circle,
+                border: Border.all(color: Colors.white, width: 1.2),
               ),
             ),
           ),
