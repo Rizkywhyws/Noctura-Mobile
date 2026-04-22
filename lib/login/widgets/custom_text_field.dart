@@ -22,6 +22,13 @@ class CustomTextField extends StatelessWidget {
     this.validator,
   });
 
+  static const _fillColor = Color(0xFFEEF4FF);
+  static const _borderColor = Color(0xFFC7D9F8);
+  static const _focusColor = Color(0xFF1565C0);
+  static const _errorSoft = Color(0xFFFFEBEE);
+  static const _errorBorder = Color(0xFFEF9A9A);
+  static const _errorStrong = Color(0xFFD32F2F);
+
   @override
   Widget build(BuildContext context) {
     return Column(
@@ -37,51 +44,78 @@ class CustomTextField extends StatelessWidget {
           ),
         ),
         const SizedBox(height: 8),
-        Container(
-          decoration: BoxDecoration(
-            // ✅ Background biru muda senada tema
-            color: const Color(0xFFEEF4FF),
-            borderRadius: BorderRadius.circular(28),
-            border: Border.all(color: const Color(0xFFC7D9F8), width: 1),
+        TextFormField(
+          controller: controller,
+          obscureText: isPassword ? obscureText : false,
+          validator: validator,
+          style: const TextStyle(
+            fontSize: 14,
+            color: Color(0xFF0B1D51),
+            fontWeight: FontWeight.w500,
           ),
-          child: TextFormField(
-            controller: controller,
-            obscureText: isPassword ? obscureText : false,
-            validator: validator,
-            style: const TextStyle(fontSize: 14, color: Color(0xFF0B1D51)),
-            decoration: InputDecoration(
-              hintText: hint,
-              hintStyle: const TextStyle(color: Color(0xFFBDBDBD), fontSize: 14),
-              prefixIcon: Icon(icon, size: 20, color: const Color(0xFF1565C0)),
-              suffixIcon: isPassword
-                  ? IconButton(
-                      icon: Icon(
-                        obscureText
-                            ? Icons.visibility_off_outlined
-                            : Icons.visibility_outlined,
-                        size: 20,
-                        color: const Color(0xFF9E9E9E),
-                      ),
-                      onPressed: onTogglePassword,
-                    )
-                  : null,
-              border: InputBorder.none,
-              contentPadding: const EdgeInsets.symmetric(
-                horizontal: 20,
-                vertical: 16,
+          decoration: InputDecoration(
+            hintText: hint,
+            hintStyle: const TextStyle(
+              color: Color(0xFFBDBDBD),
+              fontSize: 14,
+            ),
+            prefixIcon: Icon(
+              icon,
+              size: 20,
+              color: _focusColor,
+            ),
+            suffixIcon: isPassword
+                ? IconButton(
+                    icon: Icon(
+                      obscureText
+                          ? Icons.visibility_off_outlined
+                          : Icons.visibility_outlined,
+                      size: 20,
+                      color: const Color(0xFF9E9E9E),
+                    ),
+                    onPressed: onTogglePassword,
+                  )
+                : null,
+            filled: true,
+            fillColor: _fillColor,
+            contentPadding: const EdgeInsets.symmetric(
+              horizontal: 20,
+              vertical: 16,
+            ),
+            errorMaxLines: 2,
+            errorStyle: const TextStyle(
+              fontSize: 11,
+              fontWeight: FontWeight.w500,
+              color: _errorStrong,
+              height: 1.35,
+            ),
+            prefixIconColor: _focusColor,
+            enabledBorder: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(28),
+              borderSide: const BorderSide(
+                color: _borderColor,
+                width: 1,
               ),
-              // ✅ Error style yang tetap rapi
-              errorStyle: const TextStyle(
-                fontSize: 11,
-                color: Color(0xFFD32F2F),
+            ),
+            focusedBorder: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(28),
+              borderSide: const BorderSide(
+                color: _focusColor,
+                width: 1.2,
               ),
-              errorBorder: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(28),
-                borderSide: const BorderSide(color: Color(0xFFEF9A9A), width: 1),
+            ),
+            errorBorder: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(28),
+              borderSide: const BorderSide(
+                color: _errorBorder,
+                width: 1.2,
               ),
-              focusedErrorBorder: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(28),
-                borderSide: const BorderSide(color: Color(0xFFD32F2F), width: 1.2),
+            ),
+            focusedErrorBorder: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(28),
+              borderSide: const BorderSide(
+                color: _errorStrong,
+                width: 1.4,
               ),
             ),
           ),

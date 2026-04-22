@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'widgets/wavy_header.dart';
+import '../core/widgets/wavy_header.dart';
 import 'widgets/login_form.dart';
 import 'widgets/social_login.dart';
 

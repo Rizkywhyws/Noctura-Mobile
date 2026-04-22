@@ -6,6 +6,7 @@ import 'widgets/feature_grid.dart';
 import 'widgets/insight_card.dart';
 import '../core/widgets/bottom_navigation.dart';
 import '../prediction/prediction_screen.dart';
+import '../education/education_screen.dart';
 
 class DashboardScreen extends StatefulWidget {
   const DashboardScreen({super.key});
@@ -19,11 +20,8 @@ class _DashboardScreenState extends State<DashboardScreen>
   int _selectedIndex = 0;
   bool _isDarkMode = false;
 
-  // ✅ Satu controller, dibuat sekali, tidak di-recreate
   late final AnimationController _animController;
   late final Animation<double> _fadeAnim;
-
-  // ✅ Slide direction dikontrol via Tween yang di-update, bukan rebuild controller
   late Animation<Offset> _slideAnim;
   bool _slideForward = true;
 
@@ -40,8 +38,6 @@ class _DashboardScreenState extends State<DashboardScreen>
     );
 
     _slideAnim = _buildSlideAnim(forward: true);
-
-    // Mulai sudah selesai animasi (tampil langsung)
     _animController.value = 1.0;
   }
 
@@ -64,14 +60,14 @@ class _DashboardScreenState extends State<DashboardScreen>
     if (index == _selectedIndex) return;
 
     final forward = index > _selectedIndex;
-
-    // ✅ Update tween direction SEBELUM setState
     _slideAnim = _buildSlideAnim(forward: forward);
 
     setState(() => _selectedIndex = index);
-
-    // ✅ Jalankan animasi dari 0 — controller tidak di-dispose/recreate
     _animController.forward(from: 0);
+  }
+
+  void _goToEducation() {
+    _onTabTapped(3);
   }
 
   void _toggleTheme() => setState(() => _isDarkMode = !_isDarkMode);
@@ -93,12 +89,9 @@ class _DashboardScreenState extends State<DashboardScreen>
               isDarkMode: _isDarkMode,
               onThemeToggle: _toggleTheme,
             ),
-
             Expanded(
               child: Stack(
                 children: [
-                  // ✅ IndexedStack: semua halaman tetap hidup di memory,
-                  // tidak ada rebuild saat pindah tab
                   IndexedStack(
                     index: _selectedIndex,
                     children: [
@@ -106,18 +99,16 @@ class _DashboardScreenState extends State<DashboardScreen>
                         hPadding: hPadding,
                         vGap: vGap,
                         isSmallScreen: isSmallScreen,
+                        onEducationTap: _goToEducation,
                       ),
                       const AssessmentScreen(),
-                      // Tambah tab lain di sini
+                      const SizedBox(),
+                      const EducationScreen(),
                     ],
                   ),
-
-                  // ✅ Overlay animasi di atas IndexedStack
-                  // Pointer events diteruskan ke bawah saat animasi selesai
                   AnimatedBuilder(
                     animation: _animController,
                     builder: (context, _) {
-                      // Animasi selesai → overlay transparan & tidak intercept touch
                       if (_animController.isCompleted) {
                         return const SizedBox.shrink();
                       }
@@ -140,7 +131,6 @@ class _DashboardScreenState extends State<DashboardScreen>
                 ],
               ),
             ),
-
             SafeArea(
               top: false,
               child: BottomNavigation(
@@ -155,16 +145,19 @@ class _DashboardScreenState extends State<DashboardScreen>
   }
 }
 
+
 // ── Dashboard home page dipisah jadi widget sendiri ──
 class _DashboardHome extends StatelessWidget {
   final double hPadding;
   final double vGap;
   final bool isSmallScreen;
+  final VoidCallback onEducationTap;
 
   const _DashboardHome({
     required this.hPadding,
     required this.vGap,
     required this.isSmallScreen,
+    required this.onEducationTap,
   });
 
   @override
@@ -174,7 +167,7 @@ class _DashboardHome extends StatelessWidget {
       SizedBox(height: vGap),
       const PredictionButton(),
       SizedBox(height: vGap),
-      const FeatureGrid(),
+      FeatureGrid(),
       SizedBox(height: vGap),
       const InsightCard(),
     ];
@@ -182,16 +175,14 @@ class _DashboardHome extends StatelessWidget {
     return isSmallScreen
         ? SingleChildScrollView(
             physics: const BouncingScrollPhysics(),
-            padding:
-                EdgeInsets.symmetric(horizontal: hPadding, vertical: 16),
+            padding: EdgeInsets.symmetric(horizontal: hPadding, vertical: 16),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: children,
             ),
           )
         : Padding(
-            padding:
-                EdgeInsets.symmetric(horizontal: hPadding, vertical: 16),
+            padding: EdgeInsets.symmetric(horizontal: hPadding, vertical: 16),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.stretch,
               mainAxisAlignment: MainAxisAlignment.spaceEvenly,

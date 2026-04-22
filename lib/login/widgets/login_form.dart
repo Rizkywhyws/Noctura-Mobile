@@ -12,8 +12,10 @@ class _LoginFormState extends State<LoginForm> {
   final _formKey = GlobalKey<FormState>();
   final _usernameController = TextEditingController();
   final _passwordController = TextEditingController();
+
   bool _obscurePassword = true;
   bool _rememberMe = false;
+  bool _autoValidate = false;
 
   @override
   void dispose() {
@@ -23,13 +25,17 @@ class _LoginFormState extends State<LoginForm> {
   }
 
   void _handleLogin() {
+    setState(() => _autoValidate = true);
+
     if (_formKey.currentState!.validate()) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: const Text('Login berhasil! Selamat datang di Noctura.'),
           backgroundColor: const Color(0xFF1565C0),
           behavior: SnackBarBehavior.floating,
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(12),
+          ),
           margin: const EdgeInsets.all(16),
         ),
       );
@@ -42,6 +48,9 @@ class _LoginFormState extends State<LoginForm> {
       padding: const EdgeInsets.symmetric(horizontal: 32),
       child: Form(
         key: _formKey,
+        autovalidateMode: _autoValidate
+            ? AutovalidateMode.onUserInteraction
+            : AutovalidateMode.disabled,
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
@@ -52,8 +61,12 @@ class _LoginFormState extends State<LoginForm> {
               hint: 'Masukkan nama pengguna',
               icon: Icons.person_outline_rounded,
               controller: _usernameController,
-              validator: (v) =>
-                  v == null || v.isEmpty ? 'Nama pengguna wajib diisi' : null,
+              validator: (v) {
+                if (v == null || v.trim().isEmpty) {
+                  return 'Nama pengguna wajib diisi';
+                }
+                return null;
+              },
             ),
             const SizedBox(height: 16),
             CustomTextField(
@@ -62,11 +75,19 @@ class _LoginFormState extends State<LoginForm> {
               icon: Icons.lock_outline_rounded,
               isPassword: true,
               obscureText: _obscurePassword,
-              onTogglePassword: () =>
-                  setState(() => _obscurePassword = !_obscurePassword),
+              onTogglePassword: () {
+                setState(() => _obscurePassword = !_obscurePassword);
+              },
               controller: _passwordController,
-              validator: (v) =>
-                  v == null || v.isEmpty ? 'Kata sandi wajib diisi' : null,
+              validator: (v) {
+                if (v == null || v.isEmpty) {
+                  return 'Kata sandi wajib diisi';
+                }
+                if (v.length < 6) {
+                  return 'Kata sandi minimal 6 karakter';
+                }
+                return null;
+              },
             ),
             const SizedBox(height: 14),
             _buildOptionsRow(),
@@ -119,15 +140,22 @@ class _LoginFormState extends State<LoginForm> {
                 value: _rememberMe,
                 onChanged: (v) => setState(() => _rememberMe = v ?? false),
                 shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(5)),
+                  borderRadius: BorderRadius.circular(5),
+                ),
                 activeColor: const Color(0xFF000080),
-                side: const BorderSide(color: Color(0xFFC7D9F8), width: 1.5),
+                side: const BorderSide(
+                  color: Color(0xFFC7D9F8),
+                  width: 1.5,
+                ),
               ),
             ),
             const SizedBox(width: 8),
             const Text(
               'Ingat Saya',
-              style: TextStyle(fontSize: 13, color: Color(0xFF757575)),
+              style: TextStyle(
+                fontSize: 13,
+                color: Color(0xFF757575),
+              ),
             ),
           ],
         ),
@@ -196,7 +224,10 @@ class _LoginFormState extends State<LoginForm> {
       children: [
         Text(
           'Belum punya akun? ',
-          style: TextStyle(fontSize: 13, color: Colors.grey.shade500),
+          style: TextStyle(
+            fontSize: 13,
+            color: Colors.grey.shade500,
+          ),
         ),
         GestureDetector(
           onTap: () {},
