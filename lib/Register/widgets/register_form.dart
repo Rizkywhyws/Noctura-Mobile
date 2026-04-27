@@ -9,14 +9,20 @@ class RegisterForm extends StatefulWidget {
 }
 
 class _RegisterFormState extends State<RegisterForm> {
-  final _nameController     = TextEditingController();
-  final _emailController    = TextEditingController();
+  final _nameController = TextEditingController();
+  final _emailController = TextEditingController();
   final _passwordController = TextEditingController();
-  final _confirmController  = TextEditingController();
+  final _confirmController = TextEditingController();
 
   bool _obscurePassword = true;
-  bool _obscureConfirm  = true;
-  bool _agreeToTerms    = false;
+  bool _obscureConfirm = true;
+  bool _agreeToTerms = false;
+
+  String? _nameError;
+  String? _emailError;
+  String? _passwordError;
+  String? _confirmError;
+  String? _termsError;
 
   @override
   void dispose() {
@@ -28,28 +34,55 @@ class _RegisterFormState extends State<RegisterForm> {
   }
 
   void _handleRegister() {
-    final name     = _nameController.text.trim();
-    final email    = _emailController.text.trim();
+    final name = _nameController.text.trim();
+    final email = _emailController.text.trim();
     final password = _passwordController.text;
-    final confirm  = _confirmController.text;
+    final confirm = _confirmController.text;
 
-    if (name.isEmpty || email.isEmpty || password.isEmpty || confirm.isEmpty) {
-      _showSnackBar('Semua field harus diisi!');
-      return;
-    }
+    setState(() {
+      _nameError = name.isEmpty ? 'Nama lengkap wajib diisi' : null;
 
-    if (password != confirm) {
-      _showSnackBar('Kata sandi tidak cocok!');
-      return;
-    }
+      if (email.isEmpty) {
+        _emailError = 'Email wajib diisi';
+      } else if (!_isValidEmail(email)) {
+        _emailError = 'Format email tidak valid';
+      } else {
+        _emailError = null;
+      }
 
-    if (!_agreeToTerms) {
-      _showSnackBar('Kamu harus menyetujui syarat & ketentuan!');
-      return;
-    }
+      if (password.isEmpty) {
+        _passwordError = 'Kata sandi wajib diisi';
+      } else if (password.length < 6) {
+        _passwordError = 'Kata sandi minimal 6 karakter';
+      } else {
+        _passwordError = null;
+      }
 
-    // TODO: tambahkan logika register ke API / Firebase di sini
+      if (confirm.isEmpty) {
+        _confirmError = 'Konfirmasi kata sandi wajib diisi';
+      } else if (password != confirm) {
+        _confirmError = 'Kata sandi tidak cocok';
+      } else {
+        _confirmError = null;
+      }
+
+      _termsError =
+          !_agreeToTerms ? 'Kamu harus menyetujui syarat & ketentuan' : null;
+    });
+
+    final hasError = _nameError != null ||
+        _emailError != null ||
+        _passwordError != null ||
+        _confirmError != null ||
+        _termsError != null;
+
+    if (hasError) return;
+
     _showSnackBar('Registrasi berhasil!');
+  }
+
+  bool _isValidEmail(String email) {
+    return RegExp(r'^[^@\s]+@[^@\s]+\.[^@\s]+$').hasMatch(email);
   }
 
   void _showSnackBar(String message) {
@@ -57,7 +90,9 @@ class _RegisterFormState extends State<RegisterForm> {
       SnackBar(
         content: Text(message),
         behavior: SnackBarBehavior.floating,
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(12),
+        ),
       ),
     );
   }
@@ -70,8 +105,6 @@ class _RegisterFormState extends State<RegisterForm> {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           const SizedBox(height: 20),
-
-          // Judul
           const Center(
             child: Text(
               'Buat Akun!',
@@ -86,31 +119,30 @@ class _RegisterFormState extends State<RegisterForm> {
           const Center(
             child: Text(
               'Daftar untuk memulai',
-              style: TextStyle(fontSize: 12, color: Colors.grey),
+              style: TextStyle(
+                fontSize: 12,
+                color: Colors.grey,
+              ),
             ),
           ),
           const SizedBox(height: 20),
-
-          // Field Nama Lengkap
           CustomTextField(
             label: 'Nama Lengkap',
             hintText: 'Masukkan nama lengkap',
             prefixIcon: Icons.person_outline,
             controller: _nameController,
+            errorText: _nameError,
           ),
           const SizedBox(height: 12),
-
-          // Field Email
           CustomTextField(
             label: 'Email',
             hintText: 'Masukkan email',
             prefixIcon: Icons.email_outlined,
             controller: _emailController,
             keyboardType: TextInputType.emailAddress,
+            errorText: _emailError,
           ),
           const SizedBox(height: 12),
-
-          // Field Kata Sandi
           CustomTextField(
             label: 'Kata Sandi',
             hintText: 'Masukkan kata sandi',
@@ -118,13 +150,12 @@ class _RegisterFormState extends State<RegisterForm> {
             isPassword: true,
             controller: _passwordController,
             obscureText: _obscurePassword,
+            errorText: _passwordError,
             onToggleObscure: () {
               setState(() => _obscurePassword = !_obscurePassword);
             },
           ),
           const SizedBox(height: 12),
-
-          // Field Konfirmasi Kata Sandi
           CustomTextField(
             label: 'Konfirmasi Kata Sandi',
             hintText: 'Ulangi kata sandi',
@@ -132,13 +163,12 @@ class _RegisterFormState extends State<RegisterForm> {
             isPassword: true,
             controller: _confirmController,
             obscureText: _obscureConfirm,
+            errorText: _confirmError,
             onToggleObscure: () {
               setState(() => _obscureConfirm = !_obscureConfirm);
             },
           ),
           const SizedBox(height: 12),
-
-          // Checkbox Syarat & Ketentuan
           Row(
             children: [
               Checkbox(
@@ -148,7 +178,12 @@ class _RegisterFormState extends State<RegisterForm> {
                   borderRadius: BorderRadius.circular(4),
                 ),
                 onChanged: (val) {
-                  setState(() => _agreeToTerms = val ?? false);
+                  setState(() {
+                    _agreeToTerms = val ?? false;
+                    if (_agreeToTerms) {
+                      _termsError = null;
+                    }
+                  });
                 },
               ),
               const Text(
@@ -156,9 +191,7 @@ class _RegisterFormState extends State<RegisterForm> {
                 style: TextStyle(fontSize: 12, color: Colors.grey),
               ),
               GestureDetector(
-                onTap: () {
-                  // TODO: navigasi ke halaman syarat & ketentuan
-                },
+                onTap: () {},
                 child: const Text(
                   'Syarat & Ketentuan',
                   style: TextStyle(
@@ -170,9 +203,22 @@ class _RegisterFormState extends State<RegisterForm> {
               ),
             ],
           ),
+          if (_termsError != null) ...[
+            const SizedBox(height: 2),
+            Padding(
+              padding: const EdgeInsets.only(left: 12),
+              child: Text(
+                _termsError!,
+                style: const TextStyle(
+                  fontSize: 11,
+                  fontWeight: FontWeight.w500,
+                  color: Color(0xFFE53935),
+                  height: 1.3,
+                ),
+              ),
+            ),
+          ],
           const SizedBox(height: 18),
-
-          // Tombol DAFTAR
           SizedBox(
             width: double.infinity,
             height: 50,
@@ -205,8 +251,6 @@ class _RegisterFormState extends State<RegisterForm> {
             ),
           ),
           const SizedBox(height: 14),
-
-          // Link ke Login
           Center(
             child: Row(
               mainAxisAlignment: MainAxisAlignment.center,
