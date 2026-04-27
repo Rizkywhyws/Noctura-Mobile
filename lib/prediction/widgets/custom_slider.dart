@@ -86,17 +86,13 @@ class CustomSlider extends StatelessWidget {
             ),
           ),
 
-          // Labels bawah
-          if (showLabelsUnderAxis && labels != null && labels!.length >= 3)
+          // Labels bawah — support berapa pun jumlah label
+          if (showLabelsUnderAxis && labels != null && labels!.isNotEmpty)
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 12),
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  _labelText(labels!.first),
-                  _labelText(labels![labels!.length ~/ 2]),
-                  _labelText(labels!.last),
-                ],
+                children: labels!.map((l) => _labelText(l)).toList(),
               ),
             ),
         ],
@@ -106,7 +102,11 @@ class CustomSlider extends StatelessWidget {
 
   Widget _labelText(String text) => Text(
         text,
-        style: const TextStyle(fontSize: 11, color: Color(0xFF9CA3AF), fontWeight: FontWeight.w500),
+        style: const TextStyle(
+          fontSize: 11,
+          color: Color(0xFF9CA3AF),
+          fontWeight: FontWeight.w500,
+        ),
       );
 }
 

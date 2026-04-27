@@ -34,7 +34,7 @@ class Step2Quality extends StatelessWidget {
                   onUpdate(() => formData.sleepQuality = v.toInt()),
               activeColor: const Color(0xFFBA7517),
               showLabelsUnderAxis: true,
-              labels: const ['Buruk', 'Sedang', 'Sangat Baik'],
+              labels: const ['Sangat Buruk', 'Buruk', 'Cukup', 'Sangat Baik'],
             ),
           ),
           AssessmentCard(

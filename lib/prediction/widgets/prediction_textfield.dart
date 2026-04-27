@@ -4,7 +4,8 @@ class AssessmentTextField extends StatelessWidget {
   final String label;
   final String hint;
   final TextInputType type;
-  final void Function(String?) onSaved;
+  final void Function(String?)? onSaved;
+  final void Function(String)? onChanged;
   final String? helperText;
 
   const AssessmentTextField({
@@ -12,7 +13,8 @@ class AssessmentTextField extends StatelessWidget {
     required this.label,
     required this.hint,
     required this.type,
-    required this.onSaved,
+    this.onSaved,
+    this.onChanged,
     this.helperText,
   });
 
@@ -57,9 +59,11 @@ class AssessmentTextField extends StatelessWidget {
                   const BorderSide(color: Color(0xFF4A90C7), width: 1.5),
             ),
             helperText: helperText,
-            helperStyle: const TextStyle(fontSize: 10, color: Color(0xFF4A90C7)),
+            helperStyle:
+                const TextStyle(fontSize: 10, color: Color(0xFF4A90C7)),
           ),
           onSaved: onSaved,
+          onChanged: onChanged,
         ),
       ],
     );
