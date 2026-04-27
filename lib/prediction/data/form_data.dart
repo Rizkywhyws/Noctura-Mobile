@@ -7,7 +7,7 @@ class UserFormData {
   double sleepDuration = 6.5;
   int sleepQuality = 7;
   int stressLevel = 7;
-  int activityLevel = 35;
+int activityLevel = 0;
   int heightCm = 165;
   int weightKg = 60;
   int steps = 7000;
