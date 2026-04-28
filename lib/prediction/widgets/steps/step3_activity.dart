@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import '../../data/form_data.dart';
 import '../../widgets/prediction_card.dart';
 import '../../widgets/prediction_textfield.dart';
-import '../../widgets/activity_card.dart';
 
 class Step3Activity extends StatelessWidget {
   final UserFormData formData;
@@ -13,27 +12,6 @@ class Step3Activity extends StatelessWidget {
     required this.formData,
     required this.onUpdate,
   });
-
-  static const _activityData = [
-  (
-    value: 35,        // ✅ Nilai minimum dataset
-    label: 'Sedentary',
-    subtitle: '< 3000 langkah',
-    icon: Icons.chair_alt_outlined,
-  ),
-  (
-    value: 62,        
-    label: 'Light',
-    subtitle: '3000–6000',
-    icon: Icons.directions_walk_outlined,
-  ),
-  (
-    value: 90,        // ✅ Nilai maksimum dataset
-    label: 'Active',
-    subtitle: '> 6000 langkah',
-    icon: Icons.directions_run_outlined,
-  ),
-];
 
   @override
   Widget build(BuildContext context) {
@@ -46,17 +24,23 @@ class Step3Activity extends StatelessWidget {
             icon: Icons.directions_run_rounded,
             iconBg: const Color(0xFFEAF3DE),
             iconColor: const Color(0xFF3B6D11),
-            child: Row(
-              children: _activityData.map((a) {
-                return ActivityCard(
-                  label: a.label,
-                  subtitle: a.subtitle,
-                  icon: a.icon,
-                  selected: formData.activityLevel == a.value,
-                  onTap: () =>
-                      onUpdate(() => formData.activityLevel = a.value),
-                );
-              }).toList(),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                AssessmentTextField(
+                  label: 'Durasi Olahraga (menit/hari)',
+                  hint: '30',
+                  type: TextInputType.number,
+                  helperText: 'Contoh: 30 = ringan, 60 = sedang, 90+ = aktif',
+                  onSaved: (v) => onUpdate(
+                    () => formData.activityLevel = int.tryParse(v!) ?? 0,
+                  ),
+                ),
+                if (formData.activityLevel > 0) ...[
+                  const SizedBox(height: 12),
+                  _ActivityResult(minutes: formData.activityLevel),
+                ],
+              ],
             ),
           ),
 
@@ -67,6 +51,7 @@ class Step3Activity extends StatelessWidget {
             iconColor: const Color(0xFF0F6E56),
             child: Column(
               children: [
+                // Di Step3Activity, bagian Data Fisik (BMI)
                 Row(
                   children: [
                     Expanded(
@@ -74,8 +59,8 @@ class Step3Activity extends StatelessWidget {
                         label: 'Tinggi (cm)',
                         hint: '165',
                         type: TextInputType.number,
-                        onSaved: (v) => onUpdate(
-                          () => formData.heightCm = int.tryParse(v!) ?? 0,
+                        onChanged: (v) => onUpdate(  // ← ganti onSaved ke onChanged
+                          () => formData.heightCm = int.tryParse(v) ?? 0,
                         ),
                       ),
                     ),
@@ -85,8 +70,8 @@ class Step3Activity extends StatelessWidget {
                         label: 'Berat (kg)',
                         hint: '60',
                         type: TextInputType.number,
-                        onSaved: (v) => onUpdate(
-                          () => formData.weightKg = int.tryParse(v!) ?? 0,
+                        onChanged: (v) => onUpdate(  // ← ganti onSaved ke onChanged
+                          () => formData.weightKg = int.tryParse(v) ?? 0,
                         ),
                       ),
                     ),
@@ -115,6 +100,84 @@ class Step3Activity extends StatelessWidget {
               helperText: 'Dapat diisi otomatis dari sensor HP',
               onSaved: (v) =>
                   onUpdate(() => formData.steps = int.tryParse(v!) ?? 0),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _ActivityResult extends StatelessWidget {
+  final int minutes;
+  const _ActivityResult({required this.minutes});
+
+  // Clamp to 90 for model, but display real value
+  String get _label {
+    if (minutes < 30) return 'Sangat Rendah';
+    if (minutes < 60) return 'Ringan';
+    if (minutes < 90) return 'Sedang';
+    return 'Aktif';
+  }
+
+  Color get _bgColor {
+    if (minutes < 30) return const Color(0xFFFEECEC);
+    if (minutes < 60) return const Color(0xFFFAEEDA);
+    if (minutes < 90) return const Color(0xFFE6F1FB);
+    return const Color(0xFFEAF3DE);
+  }
+
+  Color get _textColor {
+    if (minutes < 30) return const Color(0xFF9B1C1C);
+    if (minutes < 60) return const Color(0xFF854F0B);
+    if (minutes < 90) return const Color(0xFF185FA5);
+    return const Color(0xFF3B6D11);
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.all(14),
+      decoration: BoxDecoration(
+        color: const Color(0xFFF9FAFB),
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(color: const Color(0xFFE5E7EB), width: 0.5),
+      ),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                '$minutes menit/hari',
+                style: const TextStyle(
+                  fontSize: 17,
+                  fontWeight: FontWeight.w700,
+                  color: Color(0xFF1A202C),
+                ),
+              ),
+              Text(
+                minutes > 90
+                    ? 'Akan di-clamp ke 90 untuk model'
+                    : 'Durasi aktivitas harian',
+                style: const TextStyle(fontSize: 11, color: Color(0xFF9CA3AF)),
+              ),
+            ],
+          ),
+          Container(
+            padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+            decoration: BoxDecoration(
+              color: _bgColor,
+              borderRadius: BorderRadius.circular(20),
+            ),
+            child: Text(
+              _label,
+              style: TextStyle(
+                fontSize: 12,
+                fontWeight: FontWeight.w600,
+                color: _textColor,
+              ),
             ),
           ),
         ],
@@ -171,8 +234,7 @@ class _BmiResult extends StatelessWidget {
             ],
           ),
           Container(
-            padding:
-                const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+            padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
             decoration: BoxDecoration(
               color: _bgColor,
               borderRadius: BorderRadius.circular(20),
