@@ -2,7 +2,8 @@ import 'dart:typed_data';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import '../../../core/avatar_storage.dart';
+import '../../core/avatar_storage.dart';
+import '../../history/history_bottom_sheet.dart';
 
 class AppHeader extends StatefulWidget {
   final VoidCallback? onThemeToggle;
@@ -134,6 +135,16 @@ class _AppHeaderState extends State<AppHeader>
     );
   }
 
+  // ── History tap: gunakan callback dari parent jika ada,
+  //    fallback ke showHistorySheet langsung
+  void _onHistoryTap() {
+    if (widget.onHistoryTap != null) {
+      widget.onHistoryTap!();
+    } else {
+      showHistorySheet(context, isDarkMode: widget.isDarkMode);
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     final isDark    = widget.isDarkMode;
@@ -216,8 +227,8 @@ class _AppHeaderState extends State<AppHeader>
                           const SizedBox(width: 8),
                           RepaintBoundary(
                             child: _HistoryButton(
-                              isDarkMode: isDark,
-                              onTap: widget.onHistoryTap,
+                               isDarkMode: isDark,
+                               onTap: _onHistoryTap,
                             ),
                           ),
                           const SizedBox(width: 8),
@@ -529,8 +540,9 @@ class _TitleSection extends StatelessWidget {
 // HistoryButton
 // ─────────────────────────────────────────────────────────────────────────────
 class _HistoryButton extends StatelessWidget {
-  final bool isDarkMode;
+  final bool          isDarkMode;
   final VoidCallback? onTap;
+
   const _HistoryButton({required this.isDarkMode, this.onTap});
 
   @override

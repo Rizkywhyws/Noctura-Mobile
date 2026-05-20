@@ -44,7 +44,6 @@ class _EducationScreenState extends State<EducationScreen> {
             child: CustomScrollView(
               physics: const BouncingScrollPhysics(),
               slivers: [
-                // Header
                 SliverToBoxAdapter(
                   child: Padding(
                     padding: const EdgeInsets.fromLTRB(20, 50, 20, 20),
@@ -75,7 +74,6 @@ class _EducationScreenState extends State<EducationScreen> {
                   ),
                 ),
                 
-                // Content
                 if (_isLoading)
                   const SliverFillRemaining(
                     child: Center(child: CircularProgressIndicator()),
@@ -111,7 +109,6 @@ class _EducationScreenState extends State<EducationScreen> {
                     ),
                   ),
                 
-                // Disclaimer
                 SliverToBoxAdapter(
                   child: Padding(
                     padding: const EdgeInsets.fromLTRB(20, 8, 20, 30),

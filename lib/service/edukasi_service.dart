@@ -1,9 +1,9 @@
 import 'dart:convert';
 import 'package:http/http.dart' as http;
-import 'package:flutter/foundation.dart' show kIsWeb;
+import '../config/api_config.dart';
 
 class EdukasiService {
-  static const String baseUrl = 'http://localhost:8000/api/edukasi';
+  static const String baseUrl = '${ApiConfig.baseUrl}/edukasi';
 
   static Future<List<dynamic>> getEdukasi({bool onlyPublished = true}) async {
     try {
@@ -25,22 +25,6 @@ class EdukasiService {
     } catch (e) {
       print('❌ Exception: $e');
       return [];
-    }
-  }
-
-  static Future<Map<String, dynamic>?> getEdukasiById(String id) async {
-    try {
-      final response = await http.get(Uri.parse('$baseUrl/$id'));
-      
-      if (response.statusCode == 200) {
-        final Map<String, dynamic> data = json.decode(response.body);
-        return data['data'];
-      } else {
-        return null;
-      }
-    } catch (e) {
-      print('❌ Exception: $e');
-      return null;
     }
   }
 }

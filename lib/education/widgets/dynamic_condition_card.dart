@@ -27,6 +27,19 @@ class DynamicConditionCard extends StatelessWidget {
     final penulis = edukasi['penulis'] ?? 'Admin Noctura';
     final estimasiWaktu = edukasi['estimasi_waktu_baca'] ?? '5 menit';
     final accent = _getAccentColor(kategori);
+    final gambarArtikel = edukasi['gambar_artikel'] ?? '';
+    
+    String getImageUrl() {
+      if (gambarArtikel.isEmpty) return '';
+      String fileName = gambarArtikel;
+      if (fileName.contains('/')) {
+        fileName = fileName.split('/').last;
+      }
+      return 'http://192.168.1.130:8000/storage/edukasi/$fileName';
+    }
+    
+    final String imageUrl = getImageUrl();
+    final bool hasImage = imageUrl.isNotEmpty;
     
     String deskripsi = ringkasan.isNotEmpty ? ringkasan : isiArtikel;
     if (deskripsi.length > 100) {
@@ -56,6 +69,24 @@ class DynamicConditionCard extends StatelessWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
+                // Preview Gambar
+                if (hasImage)
+                  ClipRRect(
+                    borderRadius: BorderRadius.circular(12),
+                    child: Image.network(
+                      imageUrl,
+                      width: double.infinity,
+                      height: 120,
+                      fit: BoxFit.cover,
+                      errorBuilder: (context, error, stackTrace) => Container(
+                        height: 120,
+                        color: accent.withOpacity(0.1),
+                        child: Icon(Icons.broken_image, color: accent),
+                      ),
+                    ),
+                  ),
+                const SizedBox(height: 12),
+                
                 Row(
                   children: [
                     Container(
@@ -133,6 +164,19 @@ class DynamicConditionCard extends StatelessWidget {
     final penulis = edukasi['penulis'] ?? 'Admin Noctura';
     final estimasiWaktu = edukasi['estimasi_waktu_baca'] ?? '5 menit';
     final accent = _getAccentColor(kategori);
+    final gambarArtikel = edukasi['gambar_artikel'] ?? '';
+    
+String getImageUrl() {
+  if (gambarArtikel.isEmpty) return '';
+  String fileName = gambarArtikel;
+  if (fileName.contains('/')) {
+    fileName = fileName.split('/').last;
+  }
+  return 'http://localhost:8000/storage/edukasi/$fileName';
+}
+    
+    final String imageUrl = getImageUrl();
+    final bool hasImage = imageUrl.isNotEmpty;
     
     String deskripsi = ringkasan.isNotEmpty ? ringkasan : isiArtikel;
     if (deskripsi.length > 100) {
@@ -170,6 +214,23 @@ class DynamicConditionCard extends StatelessWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
+                if (hasImage)
+                  ClipRRect(
+                    borderRadius: BorderRadius.circular(12),
+                    child: Image.network(
+                      imageUrl,
+                      width: double.infinity,
+                      height: 120,
+                      fit: BoxFit.cover,
+                      errorBuilder: (context, error, stackTrace) => Container(
+                        height: 120,
+                        color: accent.withOpacity(0.2),
+                        child: Icon(Icons.broken_image, color: accent),
+                      ),
+                    ),
+                  ),
+                const SizedBox(height: 12),
+                
                 Container(
                   padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 5),
                   decoration: BoxDecoration(
