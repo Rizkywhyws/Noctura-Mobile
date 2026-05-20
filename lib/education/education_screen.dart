@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import '../../../core/widgets/app_theme.dart';
-import '../core/widgets/services/edukasi_service.dart';
+import '../../core/widgets/app_theme.dart';
+import '../service/edukasi_service.dart';
 import 'widgets/dynamic_condition_card.dart';
 
 class EducationScreen extends StatefulWidget {

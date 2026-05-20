@@ -7,12 +7,21 @@ class DetailEdukasiScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final kategori = edukasi['kategori_gangguan_tidur'] ?? 'healthy';
+    final judul = edukasi['judul_artikel'] ?? 'Detail Edukasi';
+    final ringkasan = edukasi['ringkasan'] ?? '';
+    final isiArtikel = edukasi['isi_artikel'] ?? 'Konten tidak tersedia';
+    final penulis = edukasi['penulis'] ?? 'Admin Noctura';
+    final estimasiWaktu = edukasi['estimasi_waktu_baca'] ?? '5 menit';
+    final tipsPenanganan = edukasi['tips_penanganan'] ?? [];
+    final saranKonsultasi = edukasi['saran_konsultasi'] ?? '';
+    
+    // 🔥 PAKAI IP KOMPUTER
+    final String imageUrl = 'http://192.168.1.130:8000/storage/edukasi/5cjxsph4ah8rosh1oZN8LxXsin3UCIZW21w8X5Hl.jpg';
+    
     return Scaffold(
       appBar: AppBar(
-        title: Text(
-          edukasi['title'] ?? 'Detail Edukasi',
-          style: const TextStyle(fontSize: 16),
-        ),
+        title: Text(judul),
         backgroundColor: const Color(0xFF1A237E),
         foregroundColor: Colors.white,
       ),
@@ -21,124 +30,99 @@ class DetailEdukasiScreen extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // Image jika ada
-            if (edukasi['image_url'] != null && edukasi['image_url'].toString().isNotEmpty)
-              ClipRRect(
-                borderRadius: BorderRadius.circular(16),
-                child: Image.network(
-                  edukasi['image_url'],
-                  width: double.infinity,
-                  height: 200,
-                  fit: BoxFit.cover,
-                  errorBuilder: (context, error, stackTrace) => Container(
-                    height: 200,
-                    color: Colors.grey[300],
-                    child: const Center(child: Icon(Icons.broken_image, size: 48)),
-                  ),
-                ),
-              ),
-            
+            // GAMBAR
+            Image.network(
+              imageUrl,
+              width: double.infinity,
+              height: 220,
+              fit: BoxFit.cover,
+              errorBuilder: (context, error, stackTrace) {
+                print('Error: $error');
+                return Container(
+                  height: 220,
+                  color: Colors.grey[300],
+                  child: const Center(child: Text('Gambar tidak tersedia')),
+                );
+              },
+            ),
             const SizedBox(height: 20),
             
-            // Category Badge
             Container(
               padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
               decoration: BoxDecoration(
-                color: _getAccentColor().withOpacity(0.15),
+                color: _getAccentColor(kategori).withOpacity(0.15),
                 borderRadius: BorderRadius.circular(20),
               ),
               child: Text(
-                edukasi['category'] ?? 'Umum',
-                style: TextStyle(
-                  fontSize: 12,
-                  fontWeight: FontWeight.w600,
-                  color: _getAccentColor(),
-                ),
+                _getCategoryName(kategori),
+                style: TextStyle(fontSize: 12, fontWeight: FontWeight.w600, color: _getAccentColor(kategori)),
               ),
             ),
-            
             const SizedBox(height: 16),
-            
-            // Title
-            Text(
-              edukasi['title'] ?? 'No Title',
-              style: const TextStyle(
-                fontSize: 22,
-                fontWeight: FontWeight.bold,
-              ),
-            ),
-            
+            Text(judul, style: const TextStyle(fontSize: 22, fontWeight: FontWeight.bold)),
             const SizedBox(height: 12),
-            
-            // Author & Read Time
             Row(
               children: [
                 Icon(Icons.person_outline, size: 14, color: Colors.grey[600]),
                 const SizedBox(width: 4),
-                Text(
-                  edukasi['author'] ?? 'Admin',
-                  style: TextStyle(fontSize: 12, color: Colors.grey[600]),
-                ),
+                Text(penulis, style: TextStyle(fontSize: 12, color: Colors.grey[600])),
                 const SizedBox(width: 16),
                 Icon(Icons.access_time, size: 14, color: Colors.grey[600]),
                 const SizedBox(width: 4),
-                Text(
-                  edukasi['read_time'] ?? '5 menit',
-                  style: TextStyle(fontSize: 12, color: Colors.grey[600]),
-                ),
+                Text(estimasiWaktu, style: TextStyle(fontSize: 12, color: Colors.grey[600])),
               ],
             ),
-            
             const SizedBox(height: 20),
             
-            // Tags
-            if (edukasi['tags'] != null && edukasi['tags'] is List && (edukasi['tags'] as List).isNotEmpty) ...[
-              const Text(
-                'Tags',
-                style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14),
-              ),
+            if (tipsPenanganan.isNotEmpty) ...[
+              const Text('Tips Penanganan', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
               const SizedBox(height: 8),
-              Wrap(
-                spacing: 8,
-                runSpacing: 8,
-                children: (edukasi['tags'] as List).map((tag) {
-                  return Chip(
-                    label: Text(tag.toString()),
-                    backgroundColor: _getAccentColor().withOpacity(0.1),
-                  );
-                }).toList(),
-              ),
+              ...tipsPenanganan.map((tip) => Padding(
+                padding: const EdgeInsets.only(bottom: 8),
+                child: Row(children: [Text('• ', style: TextStyle(color: _getAccentColor(kategori))), Expanded(child: Text(tip))]),
+              )),
               const SizedBox(height: 20),
             ],
             
-            // Content
-            const Text(
-              'Materi Edukasi',
-              style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
-            ),
+            const Text('Materi Edukasi', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
             const SizedBox(height: 12),
-            Text(
-              edukasi['content'] ?? 'Konten tidak tersedia',
-              style: const TextStyle(height: 1.7),
-            ),
+            Text(isiArtikel, style: const TextStyle(height: 1.7)),
+            const SizedBox(height: 20),
             
-            const SizedBox(height: 30),
+            if (saranKonsultasi.isNotEmpty) ...[
+              Container(
+                padding: const EdgeInsets.all(14),
+                decoration: BoxDecoration(color: _getAccentColor(kategori).withOpacity(0.1), borderRadius: BorderRadius.circular(12)),
+                child: Column(
+                  children: [
+                    Row(children: [Icon(Icons.medical_information, size: 16, color: _getAccentColor(kategori)), const SizedBox(width: 8), Text('Saran Konsultasi', style: TextStyle(fontWeight: FontWeight.bold))]),
+                    const SizedBox(height: 6),
+                    Text(saranKonsultasi),
+                  ],
+                ),
+              ),
+            ],
           ],
         ),
       ),
     );
   }
 
-  Color _getAccentColor() {
-    switch (edukasi['category']) {
-      case 'Insomnia':
-        return const Color(0xFFEF5350);
-      case 'Sleep Apnea':
-        return const Color(0xFF3B82F6);
-      case 'Healthy':
-        return const Color(0xFF10B981);
-      default:
-        return const Color(0xFF8B5CF6);
+  String _getCategoryName(String kategori) {
+    switch (kategori) {
+      case 'insomnia': return 'INSOMNIA';
+      case 'sleep_apnea': return 'SLEEP APNEA';
+      case 'healthy': return 'TIDUR SEHAT';
+      default: return kategori.toUpperCase();
+    }
+  }
+
+  Color _getAccentColor(String kategori) {
+    switch (kategori) {
+      case 'insomnia': return const Color(0xFFEF5350);
+      case 'sleep_apnea': return const Color(0xFF3B82F6);
+      case 'healthy': return const Color(0xFF10B981);
+      default: return const Color(0xFF8B5CF6);
     }
   }
 }
