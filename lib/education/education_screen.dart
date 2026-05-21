@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import '../../core/widgets/app_theme.dart';
 import '../service/edukasi_service.dart';
 import 'widgets/dynamic_condition_card.dart';
+import 'package:google_fonts/google_fonts.dart';
 
 class EducationScreen extends StatefulWidget {
   const EducationScreen({super.key});
@@ -51,14 +52,14 @@ class _EducationScreenState extends State<EducationScreen> {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(
-                          'Edukasi Gangguan Tidur',
-                          style: TextStyle(
-                            fontSize: 28,
-                            fontWeight: FontWeight.w700,
-                            color: titleColor,
-                            letterSpacing: -0.5,
-                          ),
+                        'Edukasi Gangguan Tidur',
+                        style: GoogleFonts.plusJakartaSans(
+                          fontSize: 28,
+                          fontWeight: FontWeight.w700,
+                          color: titleColor,
+                          letterSpacing: -0.5,
                         ),
+                      ),
                         const SizedBox(height: 8),
                         Text(
                           'Kenali kondisi tidurmu dan cara mengatasinya\nuntuk hidup yang lebih sehat dan berkualitas.',

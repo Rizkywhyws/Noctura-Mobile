@@ -1,70 +1,112 @@
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:fl_chart/fl_chart.dart';
 import '../prediction_stats.dart';
 
 class MonthlyBarChart extends StatelessWidget {
   final TrenData data;
-  
+
   const MonthlyBarChart({super.key, required this.data});
 
   @override
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
-    
-    final cardBg = isDark ? const Color(0xFF151225) : Colors.white;
-    final borderColor = isDark ? const Color(0xFF2D2650) : const Color(0xFFEDF2F7);
-    final titleColor = isDark ? const Color(0xFFB9ABFF) : const Color(0xFF1A237E);
-    final gridColor = isDark ? const Color(0xFF1E1A35) : const Color(0xFFF0F4F8);
-    final axisColor = isDark ? const Color(0xFF4A4270) : const Color(0xFF94A3B8);
-    final barColor = isDark ? const Color(0xFF818CF8) : const Color(0xFF4F6FE8);
-    
-    // Hitung maxY dengan aman
+
+    final cardBg = isDark ? const Color(0xFF1C1836) : Colors.white;
+    final borderColor = isDark
+        ? const Color(0xFF3D3660)
+        : const Color(0xFFD1D5DB);
+    final textPrimary = isDark ? Colors.white : const Color(0xFF0D0F1A);
+    final textSecondary =
+        isDark ? const Color(0xFF9E9AB8) : const Color(0xFF6B7280);
+    final gridColor = isDark
+        ? Colors.white.withOpacity(0.05)
+        : Colors.black.withOpacity(0.04);
+    final barColor =
+        isDark ? const Color(0xFF818CF8) : const Color(0xFF6C63FF);
+    final tooltipBg =
+        isDark ? const Color(0xFF2D2650) : const Color(0xFF1A237E);
+
     double maxY = 5.0;
     if (data.data.isNotEmpty) {
-      int maxValue = data.data[0];
-      for (int i = 1; i < data.data.length; i++) {
-        if (data.data[i] > maxValue) {
-          maxValue = data.data[i];
-        }
-      }
-      maxY = (maxValue + 2).toDouble();
+      final maxVal = data.data.reduce((a, b) => a > b ? a : b);
+      maxY = (maxVal + 2).toDouble();
     }
 
     if (data.data.isEmpty || data.labels.isEmpty) {
       return Container(
-        padding: const EdgeInsets.all(16),
+        padding: const EdgeInsets.all(20),
         decoration: BoxDecoration(
           color: cardBg,
-          borderRadius: BorderRadius.circular(16),
-          border: Border.all(color: borderColor),
+          borderRadius: BorderRadius.circular(20),
+          border: Border.all(color: borderColor, width: 1.5),
         ),
-        child: const Center(
-          child: Text('Belum ada data prediksi'),
+        child: Center(
+          child: Text(
+            'Belum ada data prediksi',
+            style: GoogleFonts.mulish(fontSize: 13, color: textSecondary),
+          ),
         ),
       );
     }
 
     return Container(
-      padding: const EdgeInsets.all(16),
+      padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
         color: cardBg,
-        borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: borderColor),
+        borderRadius: BorderRadius.circular(20),
+        border: Border.all(color: borderColor, width: 1.5),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(
-            'Prediksi per Bulan',
-            style: TextStyle(
-              fontSize: 14,
-              fontWeight: FontWeight.w700,
-              color: titleColor,
-            ),
+          Row(
+            children: [
+              Container(
+                padding: const EdgeInsets.all(7),
+                decoration: BoxDecoration(
+                  color: barColor.withOpacity(0.12),
+                  borderRadius: BorderRadius.circular(10),
+                ),
+                child: Icon(Icons.bar_chart_rounded, size: 16, color: barColor),
+              ),
+              const SizedBox(width: 10),
+              Text(
+                'Prediksi per bulan',
+                style: GoogleFonts.nunito(
+                  fontSize: 14,
+                  fontWeight: FontWeight.w700,
+                  color: textPrimary,
+                ),
+              ),
+              const Spacer(),
+              Container(
+                padding: const EdgeInsets.symmetric(
+                    horizontal: 10, vertical: 4),
+                decoration: BoxDecoration(
+                  color: barColor.withOpacity(isDark ? 0.15 : 0.08),
+                  borderRadius: BorderRadius.circular(20),
+                  border: Border.all(
+                    color: barColor.withOpacity(isDark ? 0.35 : 0.2),
+                    width: 1.5,
+                  ),
+                ),
+                child: Text(
+                  '2025',
+                  style: GoogleFonts.nunito(
+                    fontSize: 11,
+                    fontWeight: FontWeight.w700,
+                    color: barColor,
+                  ),
+                ),
+              ),
+            ],
           ),
-          const SizedBox(height: 16),
+
+          const SizedBox(height: 20),
+
           SizedBox(
-            height: 180,
+            height: 190,
             child: BarChart(
               BarChartData(
                 maxY: maxY,
@@ -72,48 +114,47 @@ class MonthlyBarChart extends StatelessWidget {
                 gridData: FlGridData(
                   show: true,
                   drawVerticalLine: false,
-                  getDrawingHorizontalLine: (value) {
-                    return FlLine(
-                      color: gridColor,
-                      strokeWidth: 1,
-                    );
-                  },
+                  getDrawingHorizontalLine: (_) => FlLine(
+                    color: gridColor,
+                    strokeWidth: 1,
+                  ),
                 ),
                 borderData: FlBorderData(show: false),
                 titlesData: FlTitlesData(
                   leftTitles: AxisTitles(
                     sideTitles: SideTitles(
                       showTitles: true,
-                      reservedSize: 32,
-                      getTitlesWidget: (value, meta) {
-                        return Text(
-                          value.toInt().toString(),
-                          style: TextStyle(
+                      reservedSize: 28,
+                      getTitlesWidget: (value, _) => Text(
+                        value.toInt().toString(),
+                        style: GoogleFonts.mulish(
                             fontSize: 9,
-                            color: axisColor,
-                          ),
-                        );
-                      },
+                            fontWeight: FontWeight.w600,
+                            color: textSecondary),
+                      ),
                     ),
                   ),
-                  rightTitles: const AxisTitles(sideTitles: SideTitles(showTitles: false)),
-                  topTitles: const AxisTitles(sideTitles: SideTitles(showTitles: false)),
+                  rightTitles: const AxisTitles(
+                      sideTitles: SideTitles(showTitles: false)),
+                  topTitles: const AxisTitles(
+                      sideTitles: SideTitles(showTitles: false)),
                   bottomTitles: AxisTitles(
                     sideTitles: SideTitles(
                       showTitles: true,
-                      reservedSize: 32,
-                      getTitlesWidget: (value, meta) {
+                      reservedSize: 28,
+                      getTitlesWidget: (value, _) {
                         final index = value.toInt();
                         if (index < 0 || index >= data.labels.length) {
                           return const SizedBox();
                         }
                         return Padding(
-                          padding: const EdgeInsets.only(top: 4),
+                          padding: const EdgeInsets.only(top: 5),
                           child: Text(
                             data.labels[index],
-                            style: TextStyle(
+                            style: GoogleFonts.mulish(
                               fontSize: 9,
-                              color: axisColor,
+                              fontWeight: FontWeight.w600,
+                              color: textSecondary,
                             ),
                             textAlign: TextAlign.center,
                           ),
@@ -128,26 +169,25 @@ class MonthlyBarChart extends StatelessWidget {
                     barRods: [
                       BarChartRodData(
                         toY: data.data[index].toDouble(),
-                        color: barColor,
-                        width: 24,
+                        width: 20,
                         borderRadius: BorderRadius.circular(6),
+                        color: barColor,
                       ),
                     ],
                   );
                 }),
                 barTouchData: BarTouchData(
                   touchTooltipData: BarTouchTooltipData(
-                    getTooltipColor: (_) => isDark ? const Color(0xFF2D2650) : const Color(0xFF1A237E),
-                    getTooltipItem: (group, groupIndex, rod, rodIndex) {
-                      return BarTooltipItem(
-                        '${rod.toY.toInt()} prediksi',
-                        const TextStyle(
-                          color: Colors.white,
-                          fontSize: 11,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      );
-                    },
+                    getTooltipColor: (_) => tooltipBg,
+                    tooltipRoundedRadius: 10,
+                    getTooltipItem: (group, _, rod, __) => BarTooltipItem(
+                      '${rod.toY.toInt()} prediksi',
+                      GoogleFonts.mulish(
+                        color: Colors.white,
+                        fontSize: 11,
+                        fontWeight: FontWeight.w700,
+                      ),
+                    ),
                   ),
                 ),
               ),

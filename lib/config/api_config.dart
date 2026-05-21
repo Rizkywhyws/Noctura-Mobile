@@ -6,9 +6,11 @@ class ApiConfig {
 
   static String get storageUrl => baseUrl.replaceAll('/api', '/storage');
 
-  static String getImageUrl(String? path) {
-    if (path == null || path.isEmpty) return '';
-    final fileName = path.contains('/') ? path.split('/').last : path;
-    return '$storageUrl/edukasi/$fileName';
-  }
+ static String getImageUrl(String? path) {
+  if (path == null || path.isEmpty) return '';
+  if (path.startsWith('http')) return path;
+
+  final cleanPath = path.replaceFirst(RegExp(r'^/storage/'), '');
+  return '$baseUrl/image/$cleanPath';
+}
 }

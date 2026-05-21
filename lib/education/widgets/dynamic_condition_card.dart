@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
 import '../../../core/widgets/app_theme.dart';
+import '../../../config/api_config.dart';
 import '../detail_edukasi.dart';
 
 class DynamicConditionCard extends StatelessWidget {
@@ -11,46 +13,38 @@ class DynamicConditionCard extends StatelessWidget {
     return ValueListenableBuilder<bool>(
       valueListenable: AppTheme.instance,
       builder: (context, isDark, _) {
-        if (isDark) {
-          return _buildDarkCard(context);
-        }
-        return _buildLightCard(context);
+        return _buildCard(context, isDark);
       },
     );
   }
 
-  Widget _buildLightCard(BuildContext context) {
+  Widget _buildCard(BuildContext context, bool isDark) {
     final kategori = edukasi['kategori_gangguan_tidur'] ?? 'healthy';
     final judul = edukasi['judul_artikel'] ?? 'No Title';
-    final ringkasan = edukasi['ringkasan'] ?? '';
-    final isiArtikel = edukasi['isi_artikel'] ?? '';
     final penulis = edukasi['penulis'] ?? 'Admin Noctura';
     final estimasiWaktu = edukasi['estimasi_waktu_baca'] ?? '5 menit';
-    final accent = _getAccentColor(kategori);
     final gambarArtikel = edukasi['gambar_artikel'] ?? '';
-    
-    String getImageUrl() {
-      if (gambarArtikel.isEmpty) return '';
-      String fileName = gambarArtikel;
-      if (fileName.contains('/')) {
-        fileName = fileName.split('/').last;
-      }
-      return 'http://192.168.1.130:8000/storage/edukasi/$fileName';
-    }
-    
-    final String imageUrl = getImageUrl();
+    final accent = _getAccentColor(kategori);
+
+    final String imageUrl = ApiConfig.getImageUrl(gambarArtikel);
     final bool hasImage = imageUrl.isNotEmpty;
-    
-    String deskripsi = ringkasan.isNotEmpty ? ringkasan : isiArtikel;
-    if (deskripsi.length > 100) {
-      deskripsi = deskripsi.substring(0, 100) + '...';
-    }
-    
+
     return Container(
       margin: const EdgeInsets.only(bottom: 16),
       decoration: BoxDecoration(
-        color: accent.withOpacity(0.08),
         borderRadius: BorderRadius.circular(20),
+        color: isDark ? const Color(0xFF1C1836) : Colors.white,
+        border: Border.all(
+          color: isDark ? accent.withOpacity(0.25) : accent.withOpacity(0.12),
+          width: 1.0,
+        ),
+        boxShadow: [
+          BoxShadow(
+            color: accent.withOpacity(isDark ? 0.07 : 0.05),
+            blurRadius: 16,
+            offset: const Offset(0, 4),
+          ),
+        ],
       ),
       child: Material(
         color: Colors.transparent,
@@ -64,231 +58,151 @@ class DynamicConditionCard extends StatelessWidget {
             );
           },
           borderRadius: BorderRadius.circular(20),
-          child: Padding(
-            padding: const EdgeInsets.all(16),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                // Preview Gambar
-                if (hasImage)
-                  ClipRRect(
-                    borderRadius: BorderRadius.circular(12),
-                    child: Image.network(
-                      imageUrl,
-                      width: double.infinity,
-                      height: 120,
-                      fit: BoxFit.cover,
-                      errorBuilder: (context, error, stackTrace) => Container(
-                        height: 120,
-                        color: accent.withOpacity(0.1),
-                        child: Icon(Icons.broken_image, color: accent),
-                      ),
-                    ),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+
+              // Gambar — hanya tampil jika ada, tidak ada placeholder
+              if (hasImage)
+                ClipRRect(
+                  borderRadius: const BorderRadius.vertical(
+                    top: Radius.circular(20),
                   ),
-                const SizedBox(height: 12),
-                
-                Row(
+                  child: Image.network(
+                    imageUrl,
+                    width: double.infinity,
+                    height: 180,
+                    fit: BoxFit.cover,
+                    loadingBuilder: (context, child, loadingProgress) {
+                      if (loadingProgress == null) return child;
+                      return Container(
+                        height: 180,
+                        color: accent.withOpacity(0.08),
+                        child: Center(
+                          child: CircularProgressIndicator(
+                            color: accent,
+                            strokeWidth: 2,
+                          ),
+                        ),
+                      );
+                    },
+                    errorBuilder: (context, error, stackTrace) =>
+                        const SizedBox.shrink(),
+                  ),
+                ),
+
+              // Konten bawah
+              Padding(
+                padding: EdgeInsets.fromLTRB(16, hasImage ? 14 : 16, 16, 16),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
+                    // Badge kategori — Inter Tight
                     Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 5),
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 10, vertical: 4),
                       decoration: BoxDecoration(
-                        color: accent.withOpacity(0.15),
+                        color: accent.withOpacity(isDark ? 0.20 : 0.10),
                         borderRadius: BorderRadius.circular(20),
+                        border: isDark
+                            ? Border.all(
+                                color: accent.withOpacity(0.40), width: 1.0)
+                            : null,
                       ),
                       child: Text(
                         _getCategoryName(kategori),
-                        style: TextStyle(
+                        style: GoogleFonts.interTight(
                           fontSize: 10,
-                          fontWeight: FontWeight.w800,
-                          color: accent,
-                          letterSpacing: 1,
+                          fontWeight: FontWeight.w700,
+                          color: isDark ? accent.withOpacity(0.9) : accent,
+                          letterSpacing: 1.2,
                         ),
                       ),
                     ),
-                    const Spacer(),
-                    Icon(Icons.chevron_right, size: 20, color: accent),
-                  ],
-                ),
-                const SizedBox(height: 12),
-                Text(
-                  judul,
-                  style: const TextStyle(
-                    fontSize: 18,
-                    fontWeight: FontWeight.w700,
-                    color: Color(0xFF1A237E),
-                    letterSpacing: -0.3,
-                  ),
-                ),
-                const SizedBox(height: 8),
-                Text(
-                  deskripsi,
-                  style: const TextStyle(
-                    fontSize: 13,
-                    color: Color(0xFF4A5568),
-                    height: 1.5,
-                  ),
-                  maxLines: 2,
-                  overflow: TextOverflow.ellipsis,
-                ),
-                const SizedBox(height: 12),
-                Row(
-                  children: [
-                    Icon(Icons.person_outline, size: 12, color: Colors.grey[600]),
-                    const SizedBox(width: 4),
-                    Text(
-                      penulis,
-                      style: TextStyle(fontSize: 11, color: Colors.grey[600]),
-                    ),
-                    const SizedBox(width: 16),
-                    Icon(Icons.access_time, size: 12, color: Colors.grey[600]),
-                    const SizedBox(width: 4),
-                    Text(
-                      estimasiWaktu,
-                      style: TextStyle(fontSize: 11, color: Colors.grey[600]),
-                    ),
-                  ],
-                ),
-              ],
-            ),
-          ),
-        ),
-      ),
-    );
-  }
+                    const SizedBox(height: 10),
 
-  Widget _buildDarkCard(BuildContext context) {
-    final kategori = edukasi['kategori_gangguan_tidur'] ?? 'healthy';
-    final judul = edukasi['judul_artikel'] ?? 'No Title';
-    final ringkasan = edukasi['ringkasan'] ?? '';
-    final isiArtikel = edukasi['isi_artikel'] ?? '';
-    final penulis = edukasi['penulis'] ?? 'Admin Noctura';
-    final estimasiWaktu = edukasi['estimasi_waktu_baca'] ?? '5 menit';
-    final accent = _getAccentColor(kategori);
-    final gambarArtikel = edukasi['gambar_artikel'] ?? '';
-    
-String getImageUrl() {
-  if (gambarArtikel.isEmpty) return '';
-  String fileName = gambarArtikel;
-  if (fileName.contains('/')) {
-    fileName = fileName.split('/').last;
-  }
-  return 'http://localhost:8000/storage/edukasi/$fileName';
-}
-    
-    final String imageUrl = getImageUrl();
-    final bool hasImage = imageUrl.isNotEmpty;
-    
-    String deskripsi = ringkasan.isNotEmpty ? ringkasan : isiArtikel;
-    if (deskripsi.length > 100) {
-      deskripsi = deskripsi.substring(0, 100) + '...';
-    }
-    
-    return Container(
-      margin: const EdgeInsets.only(bottom: 16),
-      decoration: BoxDecoration(
-        gradient: LinearGradient(
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
-          colors: [
-            accent.withOpacity(0.16),
-            const Color(0xFF0F0D22),
-          ],
-        ),
-        borderRadius: BorderRadius.circular(20),
-        border: Border.all(color: accent.withOpacity(0.30), width: 1.0),
-      ),
-      child: Material(
-        color: Colors.transparent,
-        child: InkWell(
-          onTap: () {
-            Navigator.push(
-              context,
-              MaterialPageRoute(
-                builder: (context) => DetailEdukasiScreen(edukasi: edukasi),
-              ),
-            );
-          },
-          borderRadius: BorderRadius.circular(20),
-          child: Padding(
-            padding: const EdgeInsets.all(16),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                if (hasImage)
-                  ClipRRect(
-                    borderRadius: BorderRadius.circular(12),
-                    child: Image.network(
-                      imageUrl,
-                      width: double.infinity,
-                      height: 120,
-                      fit: BoxFit.cover,
-                      errorBuilder: (context, error, stackTrace) => Container(
-                        height: 120,
-                        color: accent.withOpacity(0.2),
-                        child: Icon(Icons.broken_image, color: accent),
-                      ),
+                    // Judul + panah — Sora
+                    Row(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Expanded(
+                          child: Text(
+                            judul,
+                            style: GoogleFonts.sora(
+                              fontSize: 15,
+                              fontWeight: FontWeight.w700,
+                              color: isDark
+                                  ? Colors.white
+                                  : const Color(0xFF1A237E),
+                              height: 1.5,
+                              letterSpacing: -0.2,
+                            ),
+                          ),
+                        ),
+                        const SizedBox(width: 8),
+                        Padding(
+                          padding: const EdgeInsets.only(top: 3),
+                          child: Icon(
+                            Icons.arrow_forward_ios_rounded,
+                            size: 13,
+                            color: accent,
+                          ),
+                        ),
+                      ],
                     ),
-                  ),
-                const SizedBox(height: 12),
-                
-                Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 5),
-                  decoration: BoxDecoration(
-                    color: accent.withOpacity(0.22),
-                    borderRadius: BorderRadius.circular(20),
-                    border: Border.all(color: accent.withOpacity(0.45), width: 1.0),
-                  ),
-                  child: Text(
-                    _getCategoryName(kategori),
-                    style: const TextStyle(
-                      fontSize: 10,
-                      fontWeight: FontWeight.w800,
-                      color: Colors.white,
-                      letterSpacing: 1,
+                    const SizedBox(height: 10),
+
+                    // Divider
+                    Divider(
+                      height: 1,
+                      color: isDark
+                          ? Colors.white.withOpacity(0.06)
+                          : Colors.black.withOpacity(0.06),
                     ),
-                  ),
-                ),
-                const SizedBox(height: 12),
-                Text(
-                  judul,
-                  style: const TextStyle(
-                    fontSize: 18,
-                    fontWeight: FontWeight.w700,
-                    color: Colors.white,
-                    letterSpacing: -0.3,
-                  ),
-                ),
-                const SizedBox(height: 8),
-                Text(
-                  deskripsi,
-                  style: const TextStyle(
-                    fontSize: 13,
-                    color: Color(0xFFCBD5E1),
-                    height: 1.5,
-                  ),
-                  maxLines: 2,
-                  overflow: TextOverflow.ellipsis,
-                ),
-                const SizedBox(height: 12),
-                Row(
-                  children: [
-                    Icon(Icons.person_outline, size: 12, color: Colors.grey[400]),
-                    const SizedBox(width: 4),
-                    Text(
-                      penulis,
-                      style: TextStyle(fontSize: 11, color: Colors.grey[400]),
-                    ),
-                    const SizedBox(width: 16),
-                    Icon(Icons.access_time, size: 12, color: Colors.grey[400]),
-                    const SizedBox(width: 4),
-                    Text(
-                      estimasiWaktu,
-                      style: TextStyle(fontSize: 11, color: Colors.grey[400]),
+                    const SizedBox(height: 10),
+
+                    // Penulis & estimasi waktu — Inter Tight
+                    Row(
+                      children: [
+                        Icon(Icons.person_outline_rounded,
+                            size: 13,
+                            color: isDark
+                                ? Colors.grey[400]
+                                : Colors.grey[500]),
+                        const SizedBox(width: 4),
+                        Text(
+                          penulis,
+                          style: GoogleFonts.interTight(
+                            fontSize: 12,
+                            fontWeight: FontWeight.w500,
+                            color: isDark
+                                ? Colors.grey[400]
+                                : Colors.grey[500],
+                          ),
+                        ),
+                        const Spacer(),
+                        Icon(Icons.schedule_rounded,
+                            size: 13,
+                            color: isDark
+                                ? Colors.grey[400]
+                                : Colors.grey[500]),
+                        const SizedBox(width: 4),
+                        Text(
+                          estimasiWaktu,
+                          style: GoogleFonts.interTight(
+                            fontSize: 12,
+                            fontWeight: FontWeight.w500,
+                            color: isDark
+                                ? Colors.grey[400]
+                                : Colors.grey[500],
+                          ),
+                        ),
+                      ],
                     ),
                   ],
                 ),
-              ],
-            ),
+              ),
+            ],
           ),
         ),
       ),
@@ -297,19 +211,27 @@ String getImageUrl() {
 
   String _getCategoryName(String kategori) {
     switch (kategori) {
-      case 'insomnia': return 'INSOMNIA';
-      case 'sleep_apnea': return 'SLEEP APNEA';
-      case 'healthy': return 'TIDUR SEHAT';
-      default: return kategori.toUpperCase();
+      case 'insomnia':
+        return 'INSOMNIA';
+      case 'sleep_apnea':
+        return 'SLEEP APNEA';
+      case 'healthy':
+        return 'TIDUR SEHAT';
+      default:
+        return kategori.toUpperCase();
     }
   }
 
   Color _getAccentColor(String kategori) {
     switch (kategori) {
-      case 'insomnia': return const Color(0xFFEF5350);
-      case 'sleep_apnea': return const Color(0xFF3B82F6);
-      case 'healthy': return const Color(0xFF10B981);
-      default: return const Color(0xFF8B5CF6);
+      case 'insomnia':
+        return const Color(0xFFEF5350);
+      case 'sleep_apnea':
+        return const Color(0xFF3B82F6);
+      case 'healthy':
+        return const Color(0xFF10B981);
+      default:
+        return const Color(0xFF8B5CF6);
     }
   }
 }
