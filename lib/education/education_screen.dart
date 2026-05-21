@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
-import '../../../core/widgets/app_theme.dart';
-import '../core/widgets/services/edukasi_service.dart';
+import '../../core/widgets/app_theme.dart';
+import '../service/edukasi_service.dart';
 import 'widgets/dynamic_condition_card.dart';
+import 'package:google_fonts/google_fonts.dart';
 
 class EducationScreen extends StatefulWidget {
   const EducationScreen({super.key});
@@ -44,7 +45,6 @@ class _EducationScreenState extends State<EducationScreen> {
             child: CustomScrollView(
               physics: const BouncingScrollPhysics(),
               slivers: [
-                // Header
                 SliverToBoxAdapter(
                   child: Padding(
                     padding: const EdgeInsets.fromLTRB(20, 50, 20, 20),
@@ -52,14 +52,14 @@ class _EducationScreenState extends State<EducationScreen> {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(
-                          'Edukasi Gangguan Tidur',
-                          style: TextStyle(
-                            fontSize: 28,
-                            fontWeight: FontWeight.w700,
-                            color: titleColor,
-                            letterSpacing: -0.5,
-                          ),
+                        'Edukasi Gangguan Tidur',
+                        style: GoogleFonts.plusJakartaSans(
+                          fontSize: 28,
+                          fontWeight: FontWeight.w700,
+                          color: titleColor,
+                          letterSpacing: -0.5,
                         ),
+                      ),
                         const SizedBox(height: 8),
                         Text(
                           'Kenali kondisi tidurmu dan cara mengatasinya\nuntuk hidup yang lebih sehat dan berkualitas.',
@@ -75,7 +75,6 @@ class _EducationScreenState extends State<EducationScreen> {
                   ),
                 ),
                 
-                // Content
                 if (_isLoading)
                   const SliverFillRemaining(
                     child: Center(child: CircularProgressIndicator()),
@@ -111,7 +110,6 @@ class _EducationScreenState extends State<EducationScreen> {
                     ),
                   ),
                 
-                // Disclaimer
                 SliverToBoxAdapter(
                   child: Padding(
                     padding: const EdgeInsets.fromLTRB(20, 8, 20, 30),
