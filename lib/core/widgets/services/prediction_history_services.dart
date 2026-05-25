@@ -7,7 +7,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import '../../model/prediction_history_result.dart';
 
 class PredictionHistoryService {
-  static const String _baseUrl = 'http://localhost:8000';
+  static const String _baseUrl = 'http://10.145.226.132:8000';
   static const String _tag = '[PredictionHistoryService]';
 
   static final PredictionHistoryService instance =
