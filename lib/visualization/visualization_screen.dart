@@ -5,6 +5,7 @@ import '../service/visualisasi_service.dart';
 import 'widgets/disorder_donut_chart.dart';
 import 'widgets/monthly_bar_chart.dart';
 import 'widgets/horizontal_rank_chart.dart';
+import '../../../core/widgets/app_theme.dart'; // pastikan path sesuai
 
 class VisualizationScreen extends StatefulWidget {
   const VisualizationScreen({super.key});
@@ -28,84 +29,89 @@ class _VisualizationScreenState extends State<VisualizationScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final isDark = Theme.of(context).brightness == Brightness.dark;
-    final bgColor = isDark ? const Color(0xFF0F0E1A) : const Color(0xFFF5F6FA);
+    // Bungkus seluruh tampilan dengan ValueListenableBuilder
+    return ValueListenableBuilder<bool>(
+      valueListenable: AppTheme.instance,
+      builder: (context, isDark, _) {
+        final bgColor = isDark ? const Color(0xFF0F0E1A) : const Color(0xFFF5F6FA);
 
-    return Scaffold(
-      backgroundColor: bgColor,
-      body: RefreshIndicator(
-        onRefresh: () async {
-          setState(() => _loadData());
-          await _futureStats;
-        },
-        child: CustomScrollView(
-          physics: const BouncingScrollPhysics(),
-          slivers: [
-            SliverToBoxAdapter(
-              child: Padding(
-                padding: const EdgeInsets.fromLTRB(20, 28, 20, 0),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      'Statistik Tidurku',
-                      style: GoogleFonts.nunito(
-                        fontSize: 26,
-                        fontWeight: FontWeight.w800,
-                        letterSpacing: -0.3,
-                        color: isDark ? Colors.white : const Color(0xFF0D0F1A),
-                        height: 1.1,
-                      ),
-                    ),
-                    const SizedBox(height: 6),
-                    Text(
-                      'Ringkasan dari semua riwayat prediksi',
-                      style: GoogleFonts.mulish(
-                        fontSize: 13,
-                        fontWeight: FontWeight.w500,
-                        color: isDark
-                            ? const Color(0xFF9E9AB8)
-                            : const Color(0xFF6B7280),
-                      ),
-                    ),
-                    const SizedBox(height: 24),
-                  ],
-                ),
-              ),
-            ),
-            SliverPadding(
-              padding: const EdgeInsets.fromLTRB(20, 0, 20, 40),
-              sliver: SliverToBoxAdapter(
-                child: FutureBuilder<PredictionStats>(
-                  future: _futureStats,
-                  builder: (context, snapshot) {
-                    if (snapshot.connectionState == ConnectionState.waiting) {
-                      return _buildLoading(isDark);
-                    }
-                    if (snapshot.hasError) {
-                      return _buildError(snapshot.error, isDark);
-                    }
-                    final data = snapshot.data!;
-                    if (data.gangguan.total == 0) {
-                      return _buildEmpty(isDark);
-                    }
-                    return Column(
+        return Scaffold(
+          backgroundColor: bgColor,
+          body: RefreshIndicator(
+            onRefresh: () async {
+              setState(() => _loadData());
+              await _futureStats;
+            },
+            child: CustomScrollView(
+              physics: const BouncingScrollPhysics(),
+              slivers: [
+                SliverToBoxAdapter(
+                  child: Padding(
+                    padding: const EdgeInsets.fromLTRB(20, 28, 20, 0),
+                    child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        HorizontalRankChart(data: data.rank),
-                        const SizedBox(height: 16),
-                        DisorderDonutChart(data: data.gangguan),
-                        const SizedBox(height: 16),
-                        MonthlyBarChart(data: data.tren),
+                        Text(
+                          'Statistik Tidurku',
+                          style: GoogleFonts.nunito(
+                            fontSize: 26,
+                            fontWeight: FontWeight.w800,
+                            letterSpacing: -0.3,
+                            color: isDark ? Colors.white : const Color(0xFF0D0F1A),
+                            height: 1.1,
+                          ),
+                        ),
+                        const SizedBox(height: 6),
+                        Text(
+                          'Ringkasan dari semua riwayat prediksi',
+                          style: GoogleFonts.mulish(
+                            fontSize: 13,
+                            fontWeight: FontWeight.w500,
+                            color: isDark
+                                ? const Color(0xFF9E9AB8)
+                                : const Color(0xFF6B7280),
+                          ),
+                        ),
+                        const SizedBox(height: 24),
                       ],
-                    );
-                  },
+                    ),
+                  ),
                 ),
-              ),
+                SliverPadding(
+                  padding: const EdgeInsets.fromLTRB(20, 0, 20, 40),
+                  sliver: SliverToBoxAdapter(
+                    child: FutureBuilder<PredictionStats>(
+                      future: _futureStats,
+                      builder: (context, snapshot) {
+                        if (snapshot.connectionState == ConnectionState.waiting) {
+                          return _buildLoading(isDark);
+                        }
+                        if (snapshot.hasError) {
+                          return _buildError(snapshot.error, isDark);
+                        }
+                        final data = snapshot.data!;
+                        if (data.gangguan.total == 0) {
+                          return _buildEmpty(isDark);
+                        }
+                        return Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            HorizontalRankChart(data: data.rank),
+                            const SizedBox(height: 16),
+                            DisorderDonutChart(data: data.gangguan),
+                            const SizedBox(height: 16),
+                            MonthlyBarChart(data: data.tren),
+                          ],
+                        );
+                      },
+                    ),
+                  ),
+                ),
+              ],
             ),
-          ],
-        ),
-      ),
+          ),
+        );
+      },
     );
   }
 

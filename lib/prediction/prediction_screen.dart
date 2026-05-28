@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:shared_preferences/shared_preferences.dart'; // ✅ FIX: tambah import
+import 'package:shared_preferences/shared_preferences.dart';
 import './data/form_data.dart';
 import './widgets/step_header.dart';
 import './widgets/prediction_footer.dart';
@@ -23,10 +23,11 @@ class _AssessmentScreenState extends State<AssessmentScreen>
   @override
   bool get wantKeepAlive => true;
 
-  final UserFormData _formData = UserFormData();
+  late UserFormData _formData;                 // ✅ non‑final agar bisa di‑reset
   int _currentStep = 1;
   static const int _totalSteps = 3;
   bool _isLoading = false;
+  bool _isResetting = false;                   // flag khusus reset (opsional)
 
   late final AnimationController _stepAnimController;
   late Animation<double> _stepFadeAnim;
@@ -35,6 +36,7 @@ class _AssessmentScreenState extends State<AssessmentScreen>
   @override
   void initState() {
     super.initState();
+    _formData = UserFormData();                // inisialisasi awal
     _stepAnimController = AnimationController(
       vsync: this,
       duration: const Duration(milliseconds: 260),
@@ -67,6 +69,25 @@ class _AssessmentScreenState extends State<AssessmentScreen>
     _stepAnimController.forward(from: 0);
   }
 
+  // ────────────────────── RESET FORM ──────────────────────────
+  Future<void> _resetForm() async {
+    // Tampilkan efek loading sebentar
+    setState(() => _isResetting = true);
+    await Future.delayed(const Duration(milliseconds: 400));
+
+    // Buat objek form data baru (reset semua field)
+    _formData = UserFormData();
+
+    // Kembali ke langkah pertama
+    _currentStep = 1;
+
+    // Reset animasi ke posisi awal
+    _buildStepAnims(forward: true);
+    _stepAnimController.value = 1.0;
+
+    if (mounted) setState(() => _isResetting = false);
+  }
+
   void _nextStep() {
     final error = _validateCurrentStep();
     if (error != null) { _showSnackError(error); return; }
@@ -83,11 +104,8 @@ class _AssessmentScreenState extends State<AssessmentScreen>
 
     setState(() => _isLoading = true);
     try {
-      // ✅ FIX: Ambil userId dari SharedPreferences sebelum membuat request
       final prefs  = await SharedPreferences.getInstance();
       final userId = prefs.getString('user_id') ?? '';
-
-      // ✅ FIX: Teruskan userId sebagai argumen ke-2
       final request = SleepPredictionRequest.fromFormData(_formData, userId);
       final result  = await ApiService().predict(request);
 
@@ -101,7 +119,7 @@ class _AssessmentScreenState extends State<AssessmentScreen>
     }
   }
 
-  // ── Error validasi step (synchronous — SnackBar aman) ──────────────────────
+  // ── Error snackbar ──────────────────────────────────────────
   void _showSnackError(String message) {
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
@@ -120,7 +138,7 @@ class _AssessmentScreenState extends State<AssessmentScreen>
     );
   }
 
-  // ── Error API (asynchronous — Dialog aman setelah await) ───────────────────
+  // ── Error dialog (API) ──────────────────────────────────────
   void _showErrorDialog(String message) {
     final isConnectionError =
         message.toLowerCase().contains('xmlhttprequest') ||
@@ -208,7 +226,7 @@ class _AssessmentScreenState extends State<AssessmentScreen>
           ElevatedButton.icon(
             onPressed: () {
               Navigator.of(ctx).pop();
-              _submit(); // retry
+              _submit();
             },
             icon: const Icon(Icons.refresh_rounded, size: 16),
             label: const Text('Coba Lagi'),
@@ -256,17 +274,31 @@ class _AssessmentScreenState extends State<AssessmentScreen>
                   onBack: _currentStep > 1 ? _prevStep : null,
                 ),
                 _TitleSection(step: _currentStep, isDark: isDark),
+                // ── AREA SCROLLABLE + PULL-TO-REFRESH ──────────
                 Expanded(
-                  child: AnimatedBuilder(
-                    animation: _stepAnimController,
-                    builder: (context, child) => FadeTransition(
-                      opacity: _stepFadeAnim,
-                      child: SlideTransition(
-                        position: _stepSlideAnim,
-                        child: child,
+                  child: RefreshIndicator(
+                    onRefresh: _resetForm,
+                    color: const Color(0xFF6C63FF),
+                    backgroundColor: isDark
+                        ? const Color(0xFF1C1836)
+                        : Colors.white,
+                    displacement: 60,
+                    child: SingleChildScrollView(
+                      physics: const AlwaysScrollableScrollPhysics(
+                        parent: BouncingScrollPhysics(),
+                      ),
+                      child: AnimatedBuilder(
+                        animation: _stepAnimController,
+                        builder: (context, child) => FadeTransition(
+                          opacity: _stepFadeAnim,
+                          child: SlideTransition(
+                            position: _stepSlideAnim,
+                            child: child,
+                          ),
+                        ),
+                        child: _buildCurrentStep(),
                       ),
                     ),
-                    child: _buildCurrentStep(),
                   ),
                 ),
                 AssessmentFooter(
@@ -299,25 +331,7 @@ class _AssessmentScreenState extends State<AssessmentScreen>
   }
 }
 
-// ── Keyboard-aware wrapper ────────────────────────────────────────────────────
-class _KeyboardAwareContent extends StatelessWidget {
-  final Widget child;
-  const _KeyboardAwareContent({required this.child});
-
-  @override
-  Widget build(BuildContext context) {
-    final keyboardHeight = MediaQuery.viewInsetsOf(context).bottom;
-
-    return AnimatedPadding(
-      duration: const Duration(milliseconds: 250),
-      curve: Curves.easeOutCubic,
-      padding: EdgeInsets.only(bottom: keyboardHeight),
-      child: child,
-    );
-  }
-}
-
-// ── Title section dengan dark mode support ────────────────────────────────────
+// ── Title section (tidak berubah) ──────────────────────────────────────────
 class _TitleSection extends StatelessWidget {
   final int step;
   final bool isDark;

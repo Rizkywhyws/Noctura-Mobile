@@ -6,13 +6,12 @@ import 'prediction/prediction_screen.dart';
 import 'Register/register_screen.dart';
 import 'education/education_screen.dart';
 import 'service/notification_service.dart';
+import 'login/forgot-password.dart';
+import 'login/verify-otp.dart';
+import 'login/reset-password.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-
-  // Init plugin saja — TIDAK schedule di sini karena token belum ada.
-  // Schedule dilakukan di NotificationHelper.initAfterLogin()
-  // yang dipanggil LoginScreen setelah login sukses.
   await NotificationService.init();
 
   runApp(const NocturaApp());
@@ -39,6 +38,17 @@ class NocturaApp extends StatelessWidget {
         '/education':     (context) => const EducationScreen(),
         '/visualization': (context) => const VisualizationScreen(),
         '/register':      (context) => const RegisterScreen(),
+        '/forgot-password': (context) => const ForgotPasswordScreen(),
+        '/forgot-password/verify': (context) => const VerifyOtpScreen(),
+      },
+      onGenerateRoute: (RouteSettings settings) {
+        if (settings.name == '/forgot-password/reset') {
+          return MaterialPageRoute(
+            builder: (context) => const ResetPasswordScreen(),
+            settings: settings, 
+          );
+        }
+        return null;
       },
     );
   }

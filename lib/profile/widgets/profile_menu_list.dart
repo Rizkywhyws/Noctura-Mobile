@@ -23,13 +23,6 @@ class ProfileMenuList extends StatelessWidget {
       iconColor: Color(0xFFD97706),
     ),
     _MenuItemData(
-      icon: Icons.auto_stories_rounded,
-      label: 'Riwayat Edukasi',
-      subtitle: 'Artikel yang pernah dibaca',
-      iconBg: Color(0xFFFFF7ED),
-      iconColor: Color(0xFFEA580C),
-    ),
-    _MenuItemData(
       icon: Icons.headset_mic_rounded,
       label: 'Dukungan & Bantuan',
       subtitle: 'FAQ, Kontak Tim',
@@ -47,11 +40,7 @@ class ProfileMenuList extends StatelessWidget {
       case 1: // Tujuan Tidur
         return () =>
             Navigator.of(context).push(_buildRoute(const SleepGoalScreen()));
-      case 2: // Riwayat Edukasi
-        return () {
-          
-        };
-      case 3: // Dukungan & Bantuan
+      case 2: // Dukungan & Bantuan
         return () =>
               Navigator.of(context).push(_buildRoute(const SupportScreen()));
       default:

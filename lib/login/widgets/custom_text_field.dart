@@ -9,6 +9,7 @@ class CustomTextField extends StatelessWidget {
   final VoidCallback? onTogglePassword;
   final TextEditingController? controller;
   final String? Function(String?)? validator;
+  final TextInputType? keyboardType;
 
   const CustomTextField({
     super.key,
@@ -20,6 +21,7 @@ class CustomTextField extends StatelessWidget {
     this.onTogglePassword,
     this.controller,
     this.validator,
+    this.keyboardType,
   });
 
   static const _fillColor = Color(0xFFEEF4FF);
@@ -46,6 +48,7 @@ class CustomTextField extends StatelessWidget {
         const SizedBox(height: 8),
         TextFormField(
           controller: controller,
+          keyboardType: keyboardType,
           obscureText: isPassword ? obscureText : false,
           validator: validator,
           style: const TextStyle(
