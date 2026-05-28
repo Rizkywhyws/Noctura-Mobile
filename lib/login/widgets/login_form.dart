@@ -43,10 +43,6 @@ class _LoginFormState extends State<LoginForm> {
     setState(() => _isLoading = false);
 
     if (result['success'] == true) {
-      // ✅ FIX: Hapus blok SharedPreferences di sini
-      // auth_token + user_id sudah disimpan di dalam AuthService.login()
-      // sehingga tidak ada await tambahan yang bisa menyebabkan
-      // "deactivated widget" error sebelum Navigator dipanggil
       Navigator.of(context).pushNamedAndRemoveUntil(
         '/dashboard',
         (route) => false,
@@ -164,7 +160,7 @@ class _LoginFormState extends State<LoginForm> {
           ],
         ),
         TextButton(
-          onPressed: () {},
+          onPressed: () => Navigator.pushNamed(context, '/forgot-password'),
           style: TextButton.styleFrom(
             padding: EdgeInsets.zero,
             minimumSize: Size.zero,

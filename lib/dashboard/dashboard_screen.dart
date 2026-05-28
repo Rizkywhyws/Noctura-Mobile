@@ -12,7 +12,7 @@ import '../visualization/visualization_screen.dart';
 import '../profile/profile_screen.dart';
 import '../sleep_log/sleep_log_screen.dart';
 import '../service/notification_service.dart';
-import '../chatbot/chatbot_screen.dart'; // ← TAMBAH INI
+import '../chatbot/chatbot_screen.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class DashboardScreen extends StatefulWidget {
@@ -67,16 +67,15 @@ class _DashboardScreenState extends State<DashboardScreen>
   }
 
   void _onLogTidurTap() {
-    Navigator.of(
-      context,
-    ).push(MaterialPageRoute(builder: (_) => const SleepLogScreen()));
+    Navigator.of(context).push(
+      MaterialPageRoute(builder: (_) => const SleepLogScreen()),
+    );
   }
 
   void _openChatbot() {
-    // ← TAMBAH METHOD INI
-    Navigator.of(
-      context,
-    ).push(MaterialPageRoute(builder: (_) => const ChatbotScreen()));
+    Navigator.of(context).push(
+      MaterialPageRoute(builder: (_) => const ChatbotScreen()),
+    );
   }
 
   @override
@@ -95,12 +94,9 @@ class _DashboardScreenState extends State<DashboardScreen>
           backgroundColor: theme.bg,
           resizeToAvoidBottomInset: false,
 
-          // ── FAB Chatbot ─────────────────────────────────────────────────
           floatingActionButton: _selectedIndex == 0
               ? Padding(
-                  padding: const EdgeInsets.only(
-                    bottom: 70,
-                  ), // ← dorong ke atas setinggi bottom nav
+                  padding: const EdgeInsets.only(bottom: 70),
                   child: FloatingActionButton(
                     onPressed: _openChatbot,
                     backgroundColor: const Color(0xFF6C63FF),
@@ -136,29 +132,29 @@ class _DashboardScreenState extends State<DashboardScreen>
                             vGap: vGap,
                             isSmallScreen: isSmall,
                             onPredictionTap: () => _onTabTapped(1),
+                            // ── FIX: gunakan arrow function eksplisit,
+                            //        bukan lambda yang mengandung debugPrint saja
                             onEducationTap: () => _onTabTapped(3),
                             onLogTidurTap: _onLogTidurTap,
                           ),
-                          const AssessmentScreen(),
-                          const VisualizationScreen(),
-                          const EducationScreen(),
-                          const ProfileScreen(),
+                          const AssessmentScreen(),   // index 1
+                          const VisualizationScreen(), // index 2
+                          const EducationScreen(),     // index 3
+                          const ProfileScreen(),       // index 4
                         ],
                       ),
 
                       AnimatedBuilder(
                         animation: _tabCtrl,
                         builder: (context, _) {
-                          if (_tabCtrl.isCompleted)
-                            return const SizedBox.shrink();
+                          if (_tabCtrl.isCompleted) return const SizedBox.shrink();
                           return FadeTransition(
-                            opacity: Tween<double>(begin: 1.0, end: 0.0)
-                                .animate(
-                                  CurvedAnimation(
-                                    parent: _tabCtrl,
-                                    curve: Curves.easeOut,
-                                  ),
-                                ),
+                            opacity: Tween<double>(begin: 1.0, end: 0.0).animate(
+                              CurvedAnimation(
+                                parent: _tabCtrl,
+                                curve: Curves.easeOut,
+                              ),
+                            ),
                             child: SlideTransition(
                               position: _slideAnim,
                               child: IgnorePointer(
@@ -188,7 +184,7 @@ class _DashboardScreenState extends State<DashboardScreen>
   }
 }
 
-// ── _DashboardHome (tidak ada perubahan) ──────────────────────────────────────
+// ── _DashboardHome ─────────────────────────────────────────────────────────────
 class _DashboardHome extends StatefulWidget {
   final double hPadding;
   final double vGap;
@@ -281,9 +277,9 @@ class _DashboardHomeState extends State<_DashboardHome>
   }
 
   Widget _animated(int index, Widget child) => FadeTransition(
-    opacity: _fades[index],
-    child: SlideTransition(position: _slides[index], child: child),
-  );
+        opacity: _fades[index],
+        child: SlideTransition(position: _slides[index], child: child),
+      );
 
   @override
   Widget build(BuildContext context) {
@@ -294,10 +290,17 @@ class _DashboardHomeState extends State<_DashboardHome>
       SizedBox(height: widget.vGap),
       _animated(2, PredictionButton(onTap: widget.onPredictionTap)),
       SizedBox(height: widget.vGap),
-      _animated(3, FeatureGrid(onLogTidurTap: widget.onLogTidurTap)),
+      // ── FIX: teruskan onEducationTap dari widget ke FeatureGrid
+      _animated(
+        3,
+        FeatureGrid(
+          onLogTidurTap: widget.onLogTidurTap,
+          onEducationTap: widget.onEducationTap,
+        ),
+      ),
       SizedBox(height: widget.vGap),
       _animated(4, InsightCard(key: ValueKey('insight_$_refreshKey'))),
-      const SizedBox(height: 80), // ← ruang agar FAB tidak nutup InsightCard
+      const SizedBox(height: 80),
     ];
 
     final scrollContent = Padding(

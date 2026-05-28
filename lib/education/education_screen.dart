@@ -36,8 +36,9 @@ class _EducationScreenState extends State<EducationScreen> {
       valueListenable: AppTheme.instance,
       builder: (context, isDark, _) {
         final titleColor = isDark ? Colors.white : const Color(0xFF1A237E);
-        final subtitleColor = isDark ? const Color(0xFF8B80C4) : const Color(0xFF718096);
-        
+        final subtitleColor =
+            isDark ? const Color(0xFF8B80C4) : const Color(0xFF718096);
+
         return Scaffold(
           backgroundColor: isDark ? const Color(0xFF0F0D22) : Colors.white,
           body: RefreshIndicator(
@@ -52,14 +53,14 @@ class _EducationScreenState extends State<EducationScreen> {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(
-                        'Edukasi Gangguan Tidur',
-                        style: GoogleFonts.plusJakartaSans(
-                          fontSize: 28,
-                          fontWeight: FontWeight.w700,
-                          color: titleColor,
-                          letterSpacing: -0.5,
+                          'Edukasi Gangguan Tidur',
+                          style: GoogleFonts.plusJakartaSans(
+                            fontSize: 28,
+                            fontWeight: FontWeight.w700,
+                            color: titleColor,
+                            letterSpacing: -0.5,
+                          ),
                         ),
-                      ),
                         const SizedBox(height: 8),
                         Text(
                           'Kenali kondisi tidurmu dan cara mengatasinya\nuntuk hidup yang lebih sehat dan berkualitas.',
@@ -74,7 +75,7 @@ class _EducationScreenState extends State<EducationScreen> {
                     ),
                   ),
                 ),
-                
+
                 if (_isLoading)
                   const SliverFillRemaining(
                     child: Center(child: CircularProgressIndicator()),
@@ -109,14 +110,16 @@ class _EducationScreenState extends State<EducationScreen> {
                       ),
                     ),
                   ),
-                
+
                 SliverToBoxAdapter(
                   child: Padding(
                     padding: const EdgeInsets.fromLTRB(20, 8, 20, 30),
                     child: Container(
                       padding: const EdgeInsets.all(14),
                       decoration: BoxDecoration(
-                        color: isDark ? const Color(0xFF1C1836) : const Color(0xFFF8FAFF),
+                        color: isDark
+                            ? const Color(0xFF1C1836)
+                            : const Color(0xFFF8FAFF),
                         borderRadius: BorderRadius.circular(16),
                         border: Border.all(
                           color: isDark
@@ -129,7 +132,9 @@ class _EducationScreenState extends State<EducationScreen> {
                           Icon(
                             Icons.info_outline_rounded,
                             size: 16,
-                            color: isDark ? const Color(0xFF60A5FA) : const Color(0xFF1A237E),
+                            color: isDark
+                                ? const Color(0xFF60A5FA)
+                                : const Color(0xFF1A237E),
                           ),
                           const SizedBox(width: 10),
                           Expanded(
@@ -137,7 +142,9 @@ class _EducationScreenState extends State<EducationScreen> {
                               'Informasi ini bersifat edukatif dan tidak menggantikan diagnosis medis. Konsultasikan ke dokter untuk penanganan lebih lanjut.',
                               style: TextStyle(
                                 fontSize: 11,
-                                color: isDark ? const Color(0xFF94A3B8) : const Color(0xFF4A5568),
+                                color: isDark
+                                    ? const Color(0xFF94A3B8)
+                                    : const Color(0xFF4A5568),
                                 height: 1.5,
                               ),
                             ),

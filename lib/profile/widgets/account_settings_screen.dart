@@ -653,14 +653,57 @@ class _TwoFAComingSoonSheet extends StatelessWidget {
 
 // ─── Delete Account Dialog ────────────────────────────────────────────────────
 
-class _DeleteAccountDialog extends StatelessWidget {
+class _DeleteAccountDialog extends StatefulWidget {
   final bool isDark;
   const _DeleteAccountDialog({required this.isDark});
 
   @override
+  State<_DeleteAccountDialog> createState() => _DeleteAccountDialogState();
+}
+
+class _DeleteAccountDialogState extends State<_DeleteAccountDialog> {
+  bool _isLoading = false;
+
+  Future<void> _handleDelete() async {
+    final token = await _TokenStorage.getToken();
+    if (token == null) {
+      Navigator.pop(context);
+      return;
+    }
+
+    setState(() => _isLoading = true);
+
+    final result = await AccountSettingsService.deleteAccount(token: token);
+
+    if (!mounted) return;
+    setState(() => _isLoading = false);
+
+    if (result.success) {
+      final prefs = await SharedPreferences.getInstance();
+      await prefs.clear();
+
+      if (!mounted) return;
+      Navigator.of(context).pushNamedAndRemoveUntil(
+        '/login', 
+        (route) => false,
+      );
+    } else {
+      Navigator.pop(context); // tutup dialog
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+        content: Text(result.message),
+        backgroundColor: const Color(0xFFE11D48),
+        behavior: SnackBarBehavior.floating,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+        margin: const EdgeInsets.all(16),
+      ));
+    }
+  }
+
+  @override
   Widget build(BuildContext context) {
     return AlertDialog(
-      backgroundColor: isDark ? const Color(0xFF1C1836) : Colors.white,
+      backgroundColor:
+          widget.isDark ? const Color(0xFF1C1836) : Colors.white,
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
       title: Row(children: [
         Container(
@@ -676,7 +719,7 @@ class _DeleteAccountDialog extends StatelessWidget {
         Text('Hapus Akun',
             style: TextStyle(
               fontSize: 16, fontWeight: FontWeight.w700,
-              color: isDark
+              color: widget.isDark
                   ? const Color(0xFFF1F5F9)
                   : const Color(0xFF0F172A),
             )),
@@ -685,23 +728,31 @@ class _DeleteAccountDialog extends StatelessWidget {
         'Tindakan ini akan menghapus semua data Anda secara permanen dan tidak dapat dipulihkan. Yakin ingin melanjutkan?',
         style: TextStyle(
           fontSize: 13.5, height: 1.5,
-          color: isDark ? const Color(0xFF8B80C4) : const Color(0xFF64748B),
+          color: widget.isDark
+              ? const Color(0xFF8B80C4)
+              : const Color(0xFF64748B),
         ),
       ),
       actions: [
         TextButton(
-          onPressed: () => Navigator.pop(context),
+          onPressed: _isLoading ? null : () => Navigator.pop(context),
           child: Text('Batal',
               style: TextStyle(
-                  color: isDark
+                  color: widget.isDark
                       ? const Color(0xFF8B80C4)
                       : const Color(0xFF64748B))),
         ),
         TextButton(
-          onPressed: () => Navigator.pop(context),
-          child: const Text('Hapus Akun',
-              style: TextStyle(
-                  color: Color(0xFFE11D48), fontWeight: FontWeight.w700)),
+          onPressed: _isLoading ? null : _handleDelete,
+          child: _isLoading
+              ? const SizedBox(
+                  width: 16, height: 16,
+                  child: CircularProgressIndicator(
+                      strokeWidth: 2, color: Color(0xFFE11D48)))
+              : const Text('Hapus Akun',
+                  style: TextStyle(
+                      color: Color(0xFFE11D48),
+                      fontWeight: FontWeight.w700)),
         ),
       ],
     );
