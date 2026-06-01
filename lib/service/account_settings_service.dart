@@ -120,9 +120,7 @@ class AccountSettingsService {
             headers: _headers(token),
           )
           .timeout(_timeout);
-
-          print('Delete Response Status: ${response.statusCode}');
-          print('Delete Response Body: ${response.body}');
+          
 
       final body = jsonDecode(response.body) as Map<String, dynamic>;
 
