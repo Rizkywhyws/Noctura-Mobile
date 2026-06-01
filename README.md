@@ -1,356 +1,222 @@
-# Sleep Disorder Prediction App
+# Noctura Mobile
 
-Sleep Disorder Prediction App adalah aplikasi mobile berbasis Machine Learning yang digunakan untuk melakukan prediksi dini terhadap potensi gangguan tidur berdasarkan data kesehatan dan gaya hidup pengguna.
+Noctura Mobile adalah aplikasi mobile berbasis Flutter yang digunakan oleh pengguna untuk melakukan prediksi gangguan tidur secara mandiri. Aplikasi ini terintegrasi dengan backend Laravel dan database MongoDB melalui REST API.
 
-Aplikasi ini mengimplementasikan algoritma Gradient Boosting (XGBoost) untuk melakukan klasifikasi kondisi tidur pengguna. Sistem terdiri dari aplikasi Flutter sebagai frontend, Flask API sebagai backend machine learning, serta model yang telah dilatih dan disimpan dalam format `.pkl`.
+Repository ini dikhususkan untuk bagian aplikasi mobile Flutter. Aplikasi ini menjadi antarmuka utama pengguna untuk melakukan prediksi, melihat riwayat, mengakses edukasi, serta berinteraksi dengan fitur chatbot berbasis AI.
+
+## Deskripsi Project
+
+Noctura Mobile merupakan aplikasi mobile yang dikembangkan menggunakan Flutter untuk platform Android dan iOS. Aplikasi ini memungkinkan pengguna untuk melakukan prediksi gangguan tidur berdasarkan input yang diberikan, melihat visualisasi hasil prediksi, mengakses konten edukasi, mencatat sleep log, serta berinteraksi dengan chatbot untuk konsultasi ringan seputar gangguan tidur.
+
+Data prediksi yang diinput pengguna dikirimkan ke backend dan disimpan di MongoDB, yang kemudian dapat dipantau oleh admin melalui Noctura Web Admin.
 
 ## Tim Pengembang
 
-| Nama | NIM / Kelas | Role | GitHub |
-|--------|------------|--------|---------|
-| Nama Anda | XXXXXXXX | Fullstack Developer & Machine Learning Engineer | @username |
+Nama Tim: Sleep Well
 
----
+| Nama                          | NIM/Kelas     | Role                                         | GitHub             |
+| ----------------------------- | ------------- | -------------------------------------------- | ------------------ |
+| [Rizky Wahyu Wangsa Syaelendra](https://github.com/Rizkywhyws) | E31240058 / A | Ketua, Frontend Mobile, Backend Web & Mobile | [@Rizkywhyws](https://github.com/Rizkywhyws) |
+| [Doan Sri Washin Sianipar](https://github.com/Doansnpr) | E31240180 / A | Frontend Web, Backend Web & Mobile           | [@Doansnpr](https://github.com/Doansnpr) |
+| [Mahmudatul Elisah](https://github.com/elisacis) | E31240350 / A | Frontend Web & Mobile, Backend Web & Mobile  | [@elisacis](https://github.com/elisacis) |
+| [Julianda Marselyna](https://github.com/juliandaMarselyna) | E31240410 / A | Frontend Web & Mobile, Backend Web & Mobile  | [@juliandaMarselyna](https://github.com/juliandaMarselyna) |
 
-# Deskripsi Project
+## Fitur Utama
 
-Sleep Disorder Prediction App merupakan sistem prediksi gangguan tidur yang dirancang untuk membantu pengguna mengetahui kemungkinan kondisi tidur mereka berdasarkan beberapa parameter kesehatan dan kebiasaan hidup.
+### 1. Login & Register
 
-Data yang dimasukkan pengguna akan dikirim melalui aplikasi Flutter menuju Flask API. Selanjutnya sistem akan memproses data menggunakan model Machine Learning yang telah dilatih menggunakan algoritma XGBoost. Hasil prediksi kemudian dikirim kembali ke aplikasi dan ditampilkan kepada pengguna secara real-time.
+Pengguna dapat mendaftarkan akun baru dan masuk ke aplikasi menggunakan email dan kata sandi. Akun dengan role user hanya dapat digunakan melalui aplikasi mobile.
 
-Project ini menggabungkan teknologi Mobile Development, Backend API, dan Machine Learning dalam satu alur sistem yang terintegrasi.
+### 2. Dashboard
 
----
+Halaman utama setelah pengguna berhasil login. Menampilkan ringkasan informasi dan navigasi menuju fitur-fitur utama aplikasi.
 
-# Gambaran Umum Sistem
+### 3. Prediksi Gangguan Tidur
 
-Berikut merupakan arsitektur umum sistem Sleep Disorder Prediction App.
+Pengguna dapat melakukan prediksi gangguan tidur dengan mengisi input yang diperlukan. Hasil prediksi dikirimkan ke backend dan disimpan di database MongoDB.
 
-![Overall Architecture](assets/overall-architecture.png)
+### 4. Riwayat Prediksi
 
-## Alur Sistem
+Pengguna dapat melihat riwayat hasil prediksi yang pernah dilakukan sebelumnya.
 
-1. Dataset dikumpulkan dan digunakan sebagai data pelatihan.
-2. Data dilakukan preprocessing untuk membersihkan dan menyesuaikan format data.
-3. Model dilatih menggunakan algoritma Gradient Boosting (XGBoost).
-4. Hasil model dievaluasi untuk mengetahui performa klasifikasi.
-5. Model terbaik disimpan dalam format `.pkl`.
-6. Flask API memuat model yang telah disimpan.
-7. Flutter mengirimkan data input pengguna ke API.
-8. API memproses data menggunakan model Machine Learning.
-9. Sistem menghasilkan prediksi gangguan tidur.
-10. Hasil prediksi dikirim kembali ke Flutter.
-11. Flutter menampilkan hasil prediksi kepada pengguna.
+### 5. Visualisasi
 
----
+Menampilkan data prediksi dalam bentuk visual (grafik atau chart) untuk memudahkan pengguna memahami pola gangguan tidur mereka.
 
-# Fitur Utama
+### 6. Sleep Log
 
-## 1. Prediksi Gangguan Tidur
+Pengguna dapat mencatat log tidur harian sebagai data tambahan untuk mendukung analisis gangguan tidur.
 
-Pengguna dapat memasukkan data kesehatan dan gaya hidup yang diperlukan untuk memperoleh hasil prediksi kondisi tidur.
+### 7. Edukasi
 
-## 2. Integrasi Machine Learning
+Pengguna dapat mengakses konten edukasi mengenai gangguan tidur yang telah dikelola oleh admin melalui web admin.
 
-Sistem menggunakan model XGBoost yang telah dilatih untuk melakukan klasifikasi gangguan tidur secara otomatis.
+### 8. Chatbot
 
-## 3. Flask REST API
+Fitur chatbot berbasis AI yang dapat digunakan pengguna untuk berkonsultasi ringan seputar gangguan tidur.
 
-Model Machine Learning diintegrasikan melalui Flask API sehingga dapat diakses oleh aplikasi mobile.
+### 9. Profil
 
-## 4. Mobile Application
+Pengguna dapat melihat dan mengelola data profil akun mereka.
 
-Aplikasi Flutter digunakan sebagai antarmuka utama pengguna untuk melakukan prediksi dan melihat hasil analisis.
+## Tech Stack
 
-## 5. Real-Time Prediction
+| Bagian          | Teknologi                      |
+| --------------- | ------------------------------ |
+| Framework       | Flutter                        |
+| Bahasa          | Dart                           |
+| Platform        | Android & iOS                  |
+| State Management | (sesuaikan dengan yang dipakai) |
+| HTTP Client     | Dio / http package             |
+| Database Lokal  | SharedPreferences / Hive       |
+| Backend API     | Laravel REST API               |
+| Database Server | MongoDB                        |
 
-Hasil prediksi dapat diperoleh secara langsung setelah data dikirimkan ke server.
+## Struktur Project
 
----
-
-# Tech Stack
-
-| Bagian | Teknologi |
-|----------|------------|
-| Mobile App | Flutter |
-| Backend API | Flask |
-| Machine Learning | XGBoost |
-| Programming Language | Python |
-| Data Processing | Pandas, NumPy |
-| Model Serialization | Pickle (.pkl) |
-| ML Library | Scikit-Learn |
-| Gradient Boosting Library | XGBoost |
-
----
-
-# Machine Learning Workflow
-
-Dataset yang digunakan akan melalui beberapa tahapan sebelum digunakan untuk prediksi.
-
-## Data Processing
-
-Tahapan preprocessing meliputi:
-
-- Data Cleaning
-- Handling Missing Value
-- Encoding Data Kategorikal
-- Feature Selection
-- Data Splitting (Training dan Testing)
-
-## Training Model
-
-Model dilatih menggunakan algoritma XGBoost karena:
-
-- Memiliki performa tinggi pada data tabular
-- Mampu menangani hubungan non-linear
-- Memiliki regularization untuk mengurangi overfitting
-- Efisien dalam proses training dan inference
-
-## Evaluasi Model
-
-Model dievaluasi menggunakan beberapa metrik klasifikasi seperti:
-
-- Accuracy
-- Precision
-- Recall
-- F1-Score
-- Confusion Matrix
-
-## Deployment Model
-
-Setelah model memperoleh performa terbaik:
-
-- Model disimpan dalam format `.pkl`
-- Flask API akan melakukan load model saat server dijalankan
-- Model siap menerima data baru dari aplikasi Flutter
-
----
-
-# Struktur Project
-
-```bash
-Sleep-Disorder-Prediction/
-│
-├── Flask_API/
-│   ├── app.py
-│   ├── model.pkl
-│   ├── requirements.txt
-│   └── dataset/
-│
-├── Flutter/
-│   ├── lib/
-│   ├── assets/
-│   └── pubspec.yaml
-│
-├── Model/
-│   ├── training.ipynb
-│   ├── preprocessing.ipynb
-│   └── evaluation.ipynb
-│
-├── assets/
-│   └── overall-architecture.png
-│
-└── README.md
+```
+SLEEP_DETECTION_MOBILE/
+├── android/
+├── build/
+├── ios/
+├── linux/
+├── macos/
+│   ├── Flutter/
+│   ├── Runner/
+│   ├── Runner.xcodeproj/
+│   └── Runner.xcworkspace/
+├── lib/
+│   ├── chatbot/
+│   ├── config/
+│   ├── core/
+│   ├── dashboard/
+│   ├── education/
+│   ├── history/
+│   ├── login/
+│   ├── models/
+│   ├── prediction/
+│   ├── profile/
+│   ├── Register/
+│   ├── service/
+│   ├── sleep_log/
+│   ├── visualization/
+│   └── main.dart
 ```
 
----
+## Prasyarat Sistem
 
-# Prasyarat Sistem
-
-Pastikan perangkat telah memiliki software berikut:
+Sebelum menjalankan project ini, pastikan perangkat sudah memiliki beberapa software berikut:
 
 - Git
-- Python 3.9+
-- Flutter SDK
-- Android Studio
-- VS Code (Opsional)
-- Pip
+- Flutter SDK 3.x+
+- Dart SDK (sudah termasuk dalam Flutter)
+- Android Studio / VS Code
+- Android Emulator atau perangkat fisik Android/iOS
+- Xcode (untuk build iOS, khusus macOS)
 
----
+## Cara Instalasi dan Menjalankan Project
 
-# Cara Instalasi dan Menjalankan Project
-
-## 1. Clone Repository
+### 1. Clone Repository
 
 ```bash
-git clone https://github.com/Rizkywhyws/e-learning.git
-cd e-learning
+git clone https://github.com/Rizkywhyws/Noctura-Mobile.git
+cd Noctura-Mobile
 ```
 
----
-
-## 2. Setup Flask API
-
-Masuk ke folder backend:
-
-```bash
-cd Flask_API
-```
-
-Buat virtual environment:
-
-```bash
-python -m venv venv
-```
-
-Aktifkan virtual environment.
-
-Windows:
-
-```bash
-venv\Scripts\activate
-```
-
-Linux / Mac:
-
-```bash
-source venv/bin/activate
-```
-
-Install dependency:
-
-```bash
-pip install -r requirements.txt
-```
-
-Jalankan server Flask:
-
-```bash
-python app.py
-```
-
-Server akan berjalan pada:
-
-```bash
-http://localhost:5000
-```
-
----
-
-## 3. Setup Flutter
-
-Masuk ke folder Flutter:
-
-```bash
-cd Flutter
-```
-
-Install dependency:
+### 2. Install Dependency Flutter
 
 ```bash
 flutter pub get
 ```
 
-Sesuaikan Base URL API pada file konfigurasi.
+### 3. Konfigurasi Base URL API
 
-Contoh:
+Sesuaikan base URL API pada file konfigurasi di `lib/config/` agar mengarah ke server backend Laravel yang sedang berjalan.
+
+Contoh konfigurasi:
 
 ```dart
-static const String baseUrl = "http://192.168.1.x:5000";
+const String baseUrl = 'http://10.0.2.2:8000/api'; // Untuk Android Emulator
+// const String baseUrl = 'http://localhost:8000/api'; // Untuk iOS Simulator
+// const String baseUrl = 'http://:8000/api';  // Untuk perangkat fisik
 ```
 
-Jalankan aplikasi:
+### 4. Pastikan Backend Sudah Berjalan
+
+Pastikan server Laravel (Noctura Web Admin) sudah berjalan sebelum menjalankan aplikasi mobile.
+
+```bash
+# Di repository Noctura-Web
+php artisan serve
+```
+
+### 5. Jalankan Aplikasi
 
 ```bash
 flutter run
 ```
 
----
+Atau pilih target device secara eksplisit:
 
-# Endpoint API
-
-## Predict Sleep Disorder
-
-### Request
-
-```http
-POST /predict
+```bash
+flutter run -d 
 ```
 
-### Body JSON
+Untuk melihat daftar device yang tersedia:
 
-```json
-{
-  "age": 25,
-  "sleep_duration": 6,
-  "stress_level": 8,
-  "physical_activity": 30
-}
+```bash
+flutter devices
 ```
 
-### Response
+### 6. Build APK (Opsional)
 
-```json
-{
-  "prediction": "Insomnia"
-}
+```bash
+flutter build apk --release
 ```
 
----
+File APK akan tersedia di:
 
-# Environment Variable
-
-Apabila menggunakan file `.env`, konfigurasi dapat disesuaikan seperti berikut:
-
-```env
-FLASK_APP=app.py
-FLASK_ENV=development
-MODEL_PATH=model.pkl
+```
+build/app/outputs/flutter-apk/app-release.apk
 ```
 
----
+## Environment & Konfigurasi
 
-# Hasil Prediksi
+Seluruh konfigurasi seperti base URL API, API key, dan pengaturan lainnya diatur pada file di direktori `lib/config/`.
 
-Sistem dapat menghasilkan klasifikasi seperti:
+Pastikan untuk tidak mengunggah konfigurasi yang berisi data sensitif ke GitHub.
 
-- Healthy Sleep
-- Insomnia
-- Sleep Apnea
+## Catatan Penggunaan
 
-Hasil prediksi ditampilkan langsung melalui aplikasi Flutter setelah proses inferensi selesai dilakukan oleh model.
+- Pastikan backend Laravel sudah berjalan sebelum menjalankan aplikasi.
+- Untuk Android Emulator, gunakan `10.0.2.2` sebagai pengganti `localhost`.
+- Untuk perangkat fisik, gunakan IP LAN dari komputer yang menjalankan backend.
+- Pastikan Flutter SDK sudah dikonfigurasi dengan benar menggunakan `flutter doctor`.
+- Jalankan `flutter pub get` setiap kali ada perubahan pada `pubspec.yaml`.
 
----
+## Halaman Aplikasi
 
-# Arsitektur Integrasi
+Beberapa halaman utama pada aplikasi mobile:
 
-Flutter bertugas sebagai client application yang menerima input pengguna.
+- Login
+- Register
+- Dashboard
+- Prediksi Gangguan Tidur
+- Riwayat Prediksi
+- Visualisasi Data
+- Sleep Log
+- Edukasi
+- Chatbot
+- Profil
 
-Flask API bertugas sebagai penghubung antara aplikasi dan model Machine Learning.
+## Relasi dengan Noctura Web Admin
 
-Model XGBoost melakukan proses inferensi berdasarkan data yang dikirimkan oleh pengguna.
+Aplikasi mobile ini terintegrasi dengan [Noctura Web Admin](https://github.com/Doansnpr/Noctura-Web) melalui REST API. Data prediksi yang dikirimkan dari aplikasi mobile akan tersimpan di MongoDB dan dapat dipantau oleh admin melalui web dashboard.
 
-Alur komunikasi:
-
-```text
-Flutter
-   ↓
-Flask API
-   ↓
-XGBoost Model (.pkl)
-   ↓
-Prediction Result
-   ↓
-Flutter UI
-```
-
----
-
-# Catatan Penggunaan
-
-- Pastikan Flask API berjalan sebelum menjalankan aplikasi Flutter.
-- Pastikan model `.pkl` tersedia pada direktori backend.
-- Gunakan IP lokal komputer ketika menghubungkan Flutter dengan Flask API melalui emulator atau perangkat Android.
-- Jangan menggunakan `localhost` pada perangkat fisik Android.
-
----
-
-# License
+## License
 
 This project is distributed under the MIT License.
 
----
+## Copyright
 
-# Copyright
-
-Copyright (c) 2026 Sleep Disorder Prediction App Team
+Copyright (c) 2026 Sleep Well Team
