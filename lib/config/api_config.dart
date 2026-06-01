@@ -1,7 +1,7 @@
 class ApiConfig {
   static const String baseUrl = String.fromEnvironment(
     'API_BASE_URL',
-    defaultValue: 'http://192.168.1.36:8000/api',
+    defaultValue: 'http://localhost:8000/api',
   );
 
   static String get storageUrl => baseUrl.replaceAll('/api', '/storage');

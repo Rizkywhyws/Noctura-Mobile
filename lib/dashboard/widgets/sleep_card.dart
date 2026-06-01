@@ -608,8 +608,8 @@ Future<void> _loadSleepGoal() async {
           return _NoGoalCard(isDark: isDark);
         }
 
-        final bedTime  = _sleepGoal!['bed_time']  as String? ?? '--:--';
-        final wakeTime = _sleepGoal!['wake_time'] as String? ?? '--:--';;
+        final bedTime  = _sleepGoal!['target_bedtime']  as String? ?? '--:--';
+        final wakeTime = _sleepGoal!['target_wake_time'] as String? ?? '--:--';
         final hours    = (_sleepGoal!['target_hours'] as num?)?.toDouble() ?? 8.0;
         final hoursStr = hours == hours.roundToDouble()
             ? '${hours.toInt()}j'

@@ -10,7 +10,7 @@ class AuthService {
     required String username,
     required String password,
   }) async {
-    final url = Uri.parse('$baseUrl/login');
+    final url = Uri.parse('$baseUrl/mobile/login');
 
     try {
       final response = await http.post(
@@ -112,9 +112,113 @@ class AuthService {
     }
   }
 
-  // ── Logout: hapus semua data tersimpan ─────────────────────────────────────
   static Future<void> logout() async {
     final prefs = await SharedPreferences.getInstance();
     await prefs.clear();
   }
+  static Future<Map<String, dynamic>> sendOtp({
+  required String email,
+}) async {
+  final url = Uri.parse('$baseUrl/mobile/forgot-password/send-otp');
+
+  try {
+    final response = await http.post(
+      url,
+      headers: {
+        'Accept': 'application/json',
+        'Content-Type': 'application/json',
+      },
+      body: jsonEncode({'email': email}),
+    );
+
+    final data = jsonDecode(response.body);
+
+    if (response.statusCode == 200 && data['success'] == true) {
+      return {'success': true, 'message': data['message']};
+    }
+
+    return {
+      'success': false,
+      'message': data['message'] ?? 'Email tidak ditemukan.',
+    };
+  } catch (e) {
+    return {
+      'success': false,
+      'message': 'Tidak bisa terhubung ke server.',
+    };
+  }
+}
+
+static Future<Map<String, dynamic>> verifyOtp({
+  required String email,
+  required String otp,
+}) async {
+  final url = Uri.parse('$baseUrl/mobile/forgot-password/verify-otp');
+
+  try {
+    final response = await http.post(
+      url,
+      headers: {
+        'Accept': 'application/json',
+        'Content-Type': 'application/json',
+      },
+      body: jsonEncode({'email': email, 'otp': int.tryParse(otp) ?? 0}),
+    );
+
+    final data = jsonDecode(response.body);
+
+    if (response.statusCode == 200 && data['success'] == true) {
+      return {'success': true, 'message': data['message']};
+    }
+
+    return {
+      'success': false,
+      'message': data['message'] ?? 'Kode OTP salah.',
+    };
+  } catch (e) {
+    return {
+      'success': false,
+      'message': 'Tidak bisa terhubung ke server.',
+    };
+  }
+}
+
+static Future<Map<String, dynamic>> resetPassword({
+  required String email,
+  required String password,
+  required String passwordConfirmation,
+}) async {
+  final url = Uri.parse('$baseUrl/mobile/forgot-password/reset');
+
+  try {
+    final response = await http.post(
+      url,
+      headers: {
+        'Accept': 'application/json',
+        'Content-Type': 'application/json',
+      },
+      body: jsonEncode({
+        'email':                 email,
+        'password':              password,
+        'password_confirmation': passwordConfirmation,
+      }),
+    );
+
+    final data = jsonDecode(response.body);
+
+    if (response.statusCode == 200 && data['success'] == true) {
+      return {'success': true, 'message': data['message']};
+    }
+
+    return {
+      'success': false,
+      'message': data['message'] ?? 'Gagal reset kata sandi.',
+    };
+  } catch (e) {
+    return {
+      'success': false,
+      'message': 'Tidak bisa terhubung ke server.',
+    };
+  }
+}
 }

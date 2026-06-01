@@ -22,7 +22,7 @@ class ServiceResult {
 class AccountSettingsService {
   AccountSettingsService._();
 
-  static final String _base = '${ApiConfig.baseUrl}/profile'; // ← fix: tambah /profile
+  static final String _base = '${ApiConfig.baseUrl}/profile'; 
 
   static const Duration _timeout = Duration(seconds: 15);
 
@@ -101,6 +101,34 @@ class AccountSettingsService {
       if (response.statusCode == 200 && body['status'] == true) {
         return ServiceResult.ok(
           body['message']?.toString() ?? 'Email berhasil diubah.',
+        );
+      }
+      return ServiceResult.err(_parseError(body));
+    } on http.ClientException {
+      return const ServiceResult.err('Tidak dapat terhubung ke server.');
+    } catch (_) {
+      return const ServiceResult.err('Terjadi kesalahan. Silakan coba lagi.');
+    }
+  }
+  static Future<ServiceResult> deleteAccount({
+    required String token,
+  }) async {
+    try {
+      final response = await http
+          .delete(
+            Uri.parse('${ApiConfig.baseUrl}/profile'),   // → /api/profile
+            headers: _headers(token),
+          )
+          .timeout(_timeout);
+
+          print('Delete Response Status: ${response.statusCode}');
+          print('Delete Response Body: ${response.body}');
+
+      final body = jsonDecode(response.body) as Map<String, dynamic>;
+
+      if (response.statusCode == 200 && body['status'] == true) {
+        return ServiceResult.ok(
+          body['message']?.toString() ?? 'Akun berhasil dihapus.',
         );
       }
       return ServiceResult.err(_parseError(body));

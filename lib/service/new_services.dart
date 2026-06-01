@@ -1,4 +1,4 @@
-// lib/features/service/sleep_goal_service.dart
+// lib/features/service/new_service.dart
 
 import 'dart:convert';
 import 'package:flutter/foundation.dart';
@@ -85,8 +85,8 @@ class SleepGoalService {
             headers: _headers(token),
             body: jsonEncode({
               'target_hours':      targetHours,
-              'bed_time':          bedTime,
-              'wake_time':         wakeTime,
+              'target_bedtime':    bedTime,
+              'target_wake_time':  wakeTime,
               'quality_goal':      qualityGoal,
               'enable_reminder':   enableReminder,
               'adaptive_schedule': adaptiveSchedule,
