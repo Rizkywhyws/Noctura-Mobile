@@ -1,10 +1,3 @@
-// lib/service/notification_helper.dart
-//
-// Helper ini dipanggil SEKALI setelah login sukses.
-// Membaca preferensi dari server lalu schedule/cancel notifikasi.
-// Dipisah dari NotificationService agar tidak ada dependency
-// ke http/SharedPreferences di layer service murni.
-
 import 'dart:convert';
 import 'package:flutter/foundation.dart';
 import 'package:http/http.dart' as http;
@@ -16,7 +9,6 @@ class NotificationHelper {
   NotificationHelper._();
 
   // ── Dipanggil setelah login sukses ───────────────────────────────────────
-  // token: plain token dari response login
   static Future<void> initAfterLogin(String token) async {
     // Web tidak support local notification — guard di sini
     if (kIsWeb) return;
