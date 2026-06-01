@@ -215,7 +215,7 @@ Aplikasi mobile ini terintegrasi dengan [Noctura Web Admin](https://github.com/D
 
 ## License
 
-This project is distributed under the MIT License.
+This project is distributed under the [MIT License](LICENSE).
 
 ## Copyright
 
